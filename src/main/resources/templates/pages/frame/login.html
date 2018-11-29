@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<title>Java管理系统</title>
+<style>
+.centerdiv {
+	position: fixed;
+	left: 50%;
+	top: 40%;
+	margin: -100px 0px 0px -150px;
+	text-align: center;
+}
+
+.layui-btn {
+	display: inline-block;
+	height: 38px;
+	line-height: 38px;
+	padding: 0 18px;
+	background-color: #009688;
+	color: #fff;
+	white-space: nowrap;
+	text-align: center;
+	font-size: 14px;
+	border: none;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+.layui-input {
+	width: 135px;
+	padding: 10px 15px;
+	border: none;
+	background: #fff;
+	outline: none;
+	height: 22px;
+	font-size: 16px;
+	color: #696969;
+	margin-left: 10px;
+}
+</style>
+</head>
+<body style="background-color: rgb(242, 242, 242)">
+	<form th:action="@{/admin/checkLogin}">
+		<div class="centerdiv">
+			<span style="color: #e0002f; transform: translateY(-20px);"
+				th:text="${err}"></span>
+			<div style="margin-top: 10px;">
+				<label>账号</label> <input type="text"
+					id="username" name="username" autocomplete="off" required class="layui-input">
+			</div>
+			<div style="margin-top: 10px;">
+				<label>密码</label> <input type="password"
+					name="password" autocomplete="off" class="layui-input">
+			</div>
+			<div style="margin-top: 10px;">
+				<button type="submit" class="layui-btn">登录</button>
+				<button type="reset" class="layui-btn">重置</button>
+			</div>
+		</div>
+	</form>
+	
+	<script>
+	window.onload = function (){
+        //判断一下当前是不是做顶层，如果不是，则做一下顶层页面重定向
+         if (window != top) {
+             top.location.href = location.href;
+         }
+         document.getElementById("username").focus();
+     }  
+    </script>
+</body>
+
+</html>

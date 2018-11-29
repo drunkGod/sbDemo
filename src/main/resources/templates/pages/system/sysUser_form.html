@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+<body>
+	<br>
+	<div class="layui-fluid">
+		<form class="layui-form" id="sysUserForm" th:action="@{/admin/sysUser/save}" autocomplete="off">
+			<input type="text" hidden="hidden" id="id" name="id" value="" /> 
+			<input type="text" hidden="hidden" id="roleId" name="roleId" value="" /> 
+			<input type="text" hidden="hidden" id="roleName" name="roleName" value="" />
+			<!-- 该password仅为去除自动填充 -->
+			<input type="password" hidden="hidden">
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color: red"> * </span>系统用户名:</label>
+				<div class="layui-input-block">
+					<input type="text" id="username" name="username" class="layui-input"
+					 	placeholder="请输入系统用户名" required >
+				</div>
+			</div>
+
+			<div class="layui-form-item" id="passwordDiv" th:if="${mode eq 'add'}">
+				<label class="layui-form-label"><span style="color: red"> * </span>用户密码:</label>
+				<div class="layui-input-block">
+					<input type="password" id="password" name="password" class="layui-input" 
+						autocomplete="new-password" placeholder="请输入系统用户密码" required >
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color: red"> * </span>所属角色:</label>
+				<div class="layui-input-block">
+					<select id="roleNameSeletor" name="roleNameSeletor" 
+						lay-filter="roleNameSeletor">
+						<option>请选择系统用户所属角色</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">真实姓名:</label>
+				<div class="layui-input-block">
+					<input type="text" id="realName" name="realName" 
+						placeholder="请输入系统用户真实姓名" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">手机号码:</label>
+				<div class="layui-input-block">
+					<input type="text" id="phone" name="phone" 
+						placeholder="请输入系统用户手机号码" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">是否有效:</label>
+				<div class="layui-input-block">
+					<input type="radio" name="valid" value="1" title="是" checked="">
+					<input type="radio" name="valid" value="0" title="否">
+				</div>
+			</div>
+		</form>
+
+		<hr>
+		<div class="layui-form-item" style="text-align: center;">
+			<button type="button" id="saveBtn" class="layui-btn" onclick="save()">保存</button>
+			<button type="button" class="layui-btn layui-btn-primary"
+				onclick="parent.layer.closeAll()">关闭</button>
+		</div>
+	</div>
+
+	<!-- 功能相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	
+	//加载页面时先执行的：
+	function initData(){
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+		var mode = [[${mode}]];  
+		var id = [[${id}]];
+		var roleId = [[${roleId}]];
+		//先渲染表单，后加载
+		layui.use('form', function(){
+		  //主要是渲染radio和select
+		  var form = layui.form;
+			//加载所有角色
+			$.ajax({
+	            type: 'POST',
+	            url: ctxPath + '/admin/sysRole/getAll',
+	            data: {},
+	            dataType: 'json',
+	            success: function (res) {
+	                $("#roleNameSeletor").html("<option value=\"\" selected>请选择系统用户所属角色</option>");
+	                if(res.code == 200) {
+	                	for (var i in res.data) {
+	                        var item = res.data[i];
+	                        var str = null;
+	                        str = '<option ' + (item.roleId == roleId ? 'selected' : '') + ' value="' + item.roleId + '">' + item.roleName + '</option>';
+	                        $('#roleNameSeletor').append(str);
+	                        //重新渲染select
+	                        form.render();
+	                    }
+	                }
+	            }
+	        });
+			
+			//绑定角色下拉框事件：选择角色名时，给roleId，roleName赋值
+			form.on('select(roleNameSeletor)', function (data) {
+				$('#roleId').val(data.value);
+				$('#roleName').val($("#roleNameSeletor").find("option:selected").text());
+			})
+		});
+       
+		//根据模式和url获取数据加载表单
+		var loadUrl = ctxPath + "/admin/sysUser/get/"+id;
+		loadForm('#sysUserForm', mode, loadUrl);
+	}
+	
+	//加载Form表单数据
+	function loadForm(formId, mode, loadUrl){
+		$('#username').focus();
+		//一般加载Form表单
+		commonLoadForm(formId, mode, loadUrl);
+	}
+    
+    //保存数据
+	function save(){
+		//验证数据有效性
+		if(!commonCheckValid()){
+			return;
+		}
+		if(!checkValid()){
+			return;
+		}
+		//检查用户名是否已经存在
+		if(!checkExist()){
+			return;
+ 		}
+		//按钮不可用3s，防止重复提交
+		disabledThreeSecond('#saveBtn');
+		//一般提交Form：1.弹出加载框，2.提交成功？(关闭所有弹窗，刷新页面，提示保存成功 ) : (关闭加载，提示失败)，
+		commonSubmitForm("#sysUserForm");
+	}
+    
+	//保存时,验证数据有效性
+	function checkValid(){
+    	//所属角色检验
+    	if (isEmpty($("#roleNameSeletor").val())) {
+			parent.layer.msg('请选择系统用户所属角色', {icon:5, time:2000});
+			redBorderTwoSecond(".layui-input.layui-unselect");
+			return false;
+ 		}
+    	//手机号码检验。
+    	if (isNotEmpty($("#phone").val())) {
+    		//如果输入非数字
+			if(!isValidPhone($("#phone").val())) {
+				commonTips("#phone", '无效手机号码');
+				return false;
+			}
+ 		}
+		return true;
+	}
+	
+	//检查用户名是否已经存在
+	function checkExist(){
+		//ajax发起后台请求，此处略
+		return true;
+	}
+	</script>
+	
+	<!-- 初始化相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	//初始化数据
+	initData();
+	</script>
+
+</body>
+</html>

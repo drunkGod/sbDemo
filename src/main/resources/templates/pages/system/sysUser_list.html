@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+
+<body>
+	<form id="searchForm">
+		<div class="layui-form-item" style="margin-bottom: 0px;">
+			<label class="layui-form-label" style="width: 130px">系统用户名： </label>
+			<div class="layui-input-inline">
+				<input type="text" name="username" id="username" class="layui-input"
+					autocomplete="off">
+			</div>
+			<div class="layui-inline">
+				<label class="layui-form-mid">创建时间：</label> <input type="text"
+					style="float: left; width: 160px;" autocomplete="off"
+					id="createTimeStart" name="createTimeStart"
+					class="layui-input layDate" dateFormat="yyyy-MM-dd" /> <span
+					style="float: left; line-height: 38px; margin-left: 6px; margin-right: 6px;">至</span>
+				<input type="text" style="float: left; width: 160px;"
+					autocomplete="off" id="createTimeEnd" name="createTimeEnd"
+					class="layui-input layDate" dateFormat="yyyy-MM-dd" />
+			</div>
+			<button type="button" class="layui-btn" onclick="search()">
+				<i class="layui-icon layui-icon-search"></i>查询
+			</button>
+			<button type="button" class="layui-btn"
+				onclick="$('#searchForm')[0].reset()">
+				<i class="layui-icon layui-icon-refresh-1"></i>重置
+			</button>
+		</div>
+	</form>
+	<hr style="margin: 3px 0px 3px 0px;">
+	<button type="button" class="layui-btn" onclick="add()">
+		<i class="layui-icon layui-icon-add-1"></i>新增
+	</button>
+	<button type="button" class="layui-btn" onclick="search()">
+		<i class="layui-icon layui-icon-refresh"></i>刷新
+	</button>
+
+	<table class="layui-hide" id="sysUserTable" lay-filter="sysUserTable"></table>
+
+	<script type="text/javascript" th:inline="javascript">
+	var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+	
+	
+	layui.use('table', function(){
+	  var table = layui.table;
+	  
+	  table.render({
+	    elem: '#sysUserTable'
+	    ,url: ctxPath + '/admin/sysUser/pageData'
+	    ,cols: [ [
+	       {type:"numbers",width : 70, title:"序号"}
+	      ,{field:'username', width:150, title: '系统用户名'}
+	      ,{field:'realName', width:150, title: '真实姓名'}
+	      ,{field:'roleName', width:150, title: '所属角色'}
+	      ,{field:'phone', width:150, title: '手机号码'}
+	      ,{field:'valid', width:100, title: '是否有效', align:'center', templet: 
+	    	  function(d){return d.valid == "1" ? '<span class="layui-badge layui-bg-blue">是</span>' : '<span class="layui-badge layui-bg-gray">否</span>';}}
+	      ,{field:'createTime', width:180, title: '创建时间', sort: true, templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+
+	      ,{fixed : 'right',title : '操作',width : 250,align : 'center',toolbar : '#operationBar'}
+	    ] ]
+		  ,page: true //是否显示分页
+		  ,limits: [10, 20, 50, 100]
+		  ,limit: 10 //每页默认显示的数量
+	  });
+	  
+	  table.on('tool(sysUserTable)', function(obj) {
+			var data = obj.data; //获得当前行数据
+			var layEvent = obj.event; //获得 lay-event 对应的值
+			if (layEvent === 'view') {
+				view(data.id, data.roleId);
+			} else if (layEvent === 'edit') {
+				edit(data.id, data.roleId);
+			} else if (layEvent === 'delete') {
+				if(data.id==1){
+					parent.layer.msg('暂不支持删除admin用户！',{icon:6});
+					return;
+				}
+				del(data.id, data.roleId);
+			} else if (layEvent === 'modifyPassword') {
+				parent.layer.msg('暂不支持修改密码',{icon:6});
+			}
+		});
+	  
+	});
+	</script>
+
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
+    	<button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modifyPassword">修改密码</button>
+    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete">删除</button>
+	</script>
+
+	<script th:inline="javascript">
+	
+	function add(){
+		var title = "新增";
+		var openurl = ctxPath + "/admin/sysUser/form?mode=add";
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function view(userId, roleId) {
+		var title = "查看";
+		var openurl = ctxPath + "/admin/sysUser/form?mode=view&id="+userId+"&roleId="+roleId;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function edit(userId, roleId) {
+		var title = "编辑";
+		var openurl = ctxPath + "/admin/sysUser/form?mode=edit&id=" + userId+"&roleId="+roleId;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function del(id) {
+		parent.layer.confirm("删除后数据不可恢复，确定需要删除吗？", {
+            btn: ["确定", "取消"]
+        }, function (){
+        	var delUrl = ctxPath + "/admin/sysUser/delete/"+id;
+        	commonDelete(delUrl);
+        })
+	}
+	
+	function search(){
+		var name = $('#username').val();
+		layui.table.reload('sysUserTable',{
+			where : {
+			pageSize : 10,
+			currentPage : 1,
+			name : name,
+			createTimeStart : $('#createTimeStart').val(),
+			createTimeEnd : $('#createTimeEnd').val()
+			}
+		})
+	}
+	</script>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+<body>
+	<h1>欢迎使用，Java业务管理平台</h1>
+	<br />
+	<a href="https://me.csdn.net/HelloWorld_In_Java" target="view_frame"
+		title="联系小兵"> <i class="layui-icon layui-icon-face-smile-b"></i>
+		更多功能请联系：抓娃小兵 <br />
+	</a>
+	<div id="countTimeTo2019" style="margin-top:15px;" ></div>
+	<script>
+	layui.use(['util', 'laydate'], function(){
+	  var util = layui.util
+	  //倒计时
+	  var thisTimer, setCountdown = function(y, M, d, H, m, s){
+	    var endTime = new Date(y, M||0, d||1, H||0, m||0, s||0) //结束日期
+	    ,serverTime = new Date(); //假设为当前服务器时间，这里采用的是本地时间，实际使用一般是取服务端的
+	    clearTimeout(thisTimer);
+	    util.countdown(endTime, serverTime, function(date, serverTime, timer){
+	      var str = '<i class="layui-icon layui-icon-log"></i> 距离2019：<span style="font-size:20px;">' 
+	      	+ date[0] + '</span>'  + '天' + date[1] + '时' +  date[2] + '分' + date[3] + '秒';
+	      lay('#countTimeTo2019').html(str);
+	      thisTimer = timer;
+	    });
+	  };
+	  setCountdown(2019,1,1);
+	})
+	</script>
+</body>
+</html>
