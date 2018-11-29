@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+
+<body>
+	<form id="searchForm">
+		<div class="layui-form-item" style="margin-bottom: 0px;">
+			<label class="layui-form-label" >操作人：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="operator_name" id="operator_name" class="layui-input" autocomplete="off">
+			</div>
+			<label class="layui-form-label" >操作内容：</label>
+			<div class="layui-input-inline">
+				<input type="text" name="content" id="content" class="layui-input" autocomplete="off">
+			</div>
+			<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-search"></i>查询</button>
+			<button type="button" class="layui-btn" onclick="$('#searchForm')[0].reset()"><i class="layui-icon layui-icon-refresh-1"></i>重置</button>
+		</div>
+	</form>
+	<hr style="margin:3px 0px 3px 0px; ">
+	<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-refresh"></i>刷新</button>
+	
+	<table class="layui-hide" id="sysLogTable" lay-filter="sysLogTable"></table>
+	
+	<script type="text/javascript" th:inline="javascript">
+	var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+	layui.use('table', function(){
+	  var table = layui.table;
+	  table.render({
+	    elem: '#sysLogTable'
+	    ,url: ctxPath + '/admin/sysLog/pageData'
+	    ,cols: [ [
+	       {type:"numbers",width : 70, title:"序号"}
+	      ,{field:'operator_name', width:130, title: '操作人'}
+	      ,{field:'content', width:200, title: '操作内容'}
+	      ,{field:'uri', width:230, title: '操作路径'}
+	      ,{field:'parameter', width:300, title: '操作参数'}
+	      ,{field:'create_time', width:160, title: '操作时间', sort: true, templet: "<div>{{layui.util.toDateString(d.create_time, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+	      ,{fixed : 'right',title : '操作',width : 150,align : 'center',toolbar : '#operationBar'}
+	    ] ]
+		  ,page: true //是否显示分页
+		  ,limits: [10, 20, 50, 100]
+		  ,limit: 10 //每页默认显示的数量
+	  });
+	  
+	  table.on('tool(sysLogTable)', function(obj) {
+			var data = obj.data; //获得当前行数据
+			var layEvent = obj.event; //获得 lay-event 对应的值
+			if (layEvent === 'view') {
+				view(data.id);
+			}
+		});
+	  
+	});
+	</script>
+
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+	</script>
+	
+	<script th:inline="javascript">
+	function view(id) {
+		var title = "查看";
+		var openurl = ctxPath + "/admin/sysLog/form?mode=view&id="+id;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function search(){
+		var operator_name = $('#operator_name').val();
+		var content = $('#content').val();
+		layui.table.reload('sysLogTable',{
+			where : {
+			pageSize : 10,
+			currentPage : 1,
+			operator_name : operator_name,
+			content : content
+			}
+		})
+	}
+	</script>
+	
+</html>

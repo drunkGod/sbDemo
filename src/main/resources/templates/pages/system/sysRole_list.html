@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+<body>
+	<form id="searchForm">
+		<div class="layui-form-item" style="margin-bottom: 0px;">
+			<label class="layui-form-label" style="width: 130px">角色名称： </label>
+			<div class="layui-input-inline">
+				<input type="text" name="roleName" id="roleName" class="layui-input" autocomplete="off">
+			</div>
+			<button type="button" class="layui-btn" onclick="search()">
+				<i class="layui-icon layui-icon-search"></i>查询
+			</button>
+			<button type="button" class="layui-btn"
+				onclick="$('#searchForm')[0].reset()">
+				<i class="layui-icon layui-icon-refresh-1"></i>重置
+			</button>
+		</div>
+	</form>
+	<hr style="margin: 3px 0px 3px 0px;">
+	<button type="button" class="layui-btn" onclick="add()">
+		<i class="layui-icon layui-icon-add-1"></i>新增
+	</button>
+	<button type="button" class="layui-btn" onclick="search()">
+		<i class="layui-icon layui-icon-refresh"></i>刷新
+	</button>
+
+	<table class="layui-hide" id="sysRoleTable" lay-filter="sysRoleTable"></table>
+
+	<script type="text/javascript" th:inline="javascript">
+	var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+	layui.use('table', function(){
+	  var table = layui.table;
+	  table.render({
+	    elem: '#sysRoleTable'
+	    ,url: ctxPath + '/admin/sysRole/pageData'
+	    ,cols: [ [
+	       {type:"numbers",width : 70, title:"序号"}
+	      ,{field:'roleName', width:150, title: '角色名称' }
+	      ,{field:'roleDesc', width:250, title: '角色描述' }
+	      ,{field:'createTime', width:180, title: '创建时间', sort: true, templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+          ,{fixed : 'right',title : '操作',width : 200,align : 'center',toolbar : '#operationBar'}
+	    ] ]
+		  ,page: true //是否显示分页
+		  ,limits: [10, 20, 50, 100]
+		  ,limit: 10 //每页默认显示的数量
+	  });
+	  
+	  table.on('tool(sysRoleTable)', function(obj) {
+			var data = obj.data; //获得当前行数据
+			var layEvent = obj.event; //获得 lay-event 对应的值
+			if (layEvent === 'view') {
+				view(data.roleId);
+			} else if (layEvent === 'edit') {
+				edit(data.roleId);
+			} else if (layEvent === 'delete') {
+				if(data.roleId==1){
+					parent.layer.msg('暂不支持删除超级管理员角色！',{icon:6});
+					return;
+				}
+				del(data.roleId);
+			}
+		});
+	  
+	});
+	</script>
+
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
+    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete">删除</button>
+	</script>
+
+	<script th:inline="javascript">
+	
+	function add(){
+		var title = "新增";
+		var openurl = ctxPath + "/admin/sysRole/form?mode=add";
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function view(roleId) {
+		var title = "查看";
+		var openurl = ctxPath + "/admin/sysRole/form?mode=view&roleId="+roleId;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function edit(roleId) {
+		var title = "编辑";
+		var openurl = ctxPath + "/admin/sysRole/form?mode=edit&roleId=" + roleId;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function del(id) {
+		parent.layer.confirm("删除后数据不可恢复，确定需要删除吗？", {
+			btn: ["确定", "取消"]
+        }, function (){
+        	var delUrl = ctxPath + "/admin/sysRole/detele/"+id;
+        	commonDelete(delUrl);
+        })
+	}
+	
+	function search(){
+		var name = $('#roleName').val();
+		layui.table.reload('sysRoleTable',{
+			where : {
+			pageSize : 10,
+			currentPage : 1,
+			name : name
+			}
+		})
+	}
+	</script>
+</html>

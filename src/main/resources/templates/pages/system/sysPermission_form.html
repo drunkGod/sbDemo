@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+<body>
+	<br>
+	<div class="layui-fluid">
+		<form class="layui-form" id="sysPermForm" autocomplete="off" th:action="@{/admin/sysPermission/save}">
+			<input type="text" hidden="hidden" id="permId" name="permId" value="" />
+			<input type="text" hidden="hidden" id="permPid" name="permPid" th:value="${permPid}" />
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color: red"> * </span>权限名称:</label>
+				<div class="layui-input-block">
+					<input type="text" id="permName" name="permName" 
+						placeholder="请输入权限名称" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">父级权限:</label>
+				<div class="layui-input-block">
+					<select id="permPnameSeletor" name="permPnameSeletor" lay-filter="permPnameSeletor">
+						<option>请选择系统用户所属角色</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">权限链接:</label>
+				<div class="layui-input-block">
+					<input type="text" id="permUrl" name="permUrl" 
+						placeholder="请输入权限连接" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">权限描述:</label>
+				<div class="layui-input-block">
+					<input type="text" id="permDesc" name="permDesc" 
+						placeholder="请输入权限描述" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">是否显示:</label>
+				<div class="layui-input-block">
+					<input type="radio" name="isShow" value="1" title="是" checked="">
+					<input type="radio" name="isShow" value="0" title="否">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">排序:</label>
+				<div class="layui-input-block">
+					<input type="text" id="sort" name="sort" 
+						placeholder="请输入排序" class="layui-input">
+				</div>
+			</div>
+		</form>
+
+		<hr>
+		<div class="layui-form-item" style="text-align: center;">
+			<button type="button" id="saveBtn" class="layui-btn" onclick="save()">保存</button>
+			<button type="button" class="layui-btn layui-btn-primary" onclick="parent.layer.closeAll()">关闭</button>
+		</div>
+	</div>
+
+	<!-- 功能相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	
+	//加载页面时先执行的：
+	function initData(){
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+		//根据模式和url获取数据加载表单
+        var mode = [[${mode}]];  
+        var permId = [[${permId}]]; 
+        var permPid = [[${permPid}]]; 
+        
+      	//先渲染表单，后加载
+		layui.use('form', function(){
+		  //主要是渲染radio和select
+		  var form = layui.form;
+			//加载所有角色
+			$.ajax({
+	            type: 'POST',
+	            url: ctxPath + '/admin/sysPerm/available',
+	            data: {},
+	            dataType: 'json',
+	            success: function (res) {
+	                $("#permPnameSeletor").html("<option value=\"\" selected>根节点</option>");
+	                if(res.code == 200) {
+	                	for (var i in res.data) {
+	                        var item = res.data[i];
+	                        var str = null;
+	                        str = '<option ' + (item.permPid == permPid ? 'selected' : '') + ' value="' + item.permPid + '">' + item.permPname + '</option>';
+	                        $('#permPnameSeletor').append(str);
+	                        //重新渲染
+	                        form.render();
+	                    }
+	                }
+	            }
+	        });
+			
+			//绑定角色下拉框事件：选择角色名时，给roleId，roleName赋值
+			form.on('select(permPnameSeletor)', function (data) {
+				$('#permPid').val(data.value);
+			})
+		});
+	  	 
+		var loadUrl = ctxPath + "/admin/sysPermission/get/"+permId;
+		loadForm('#sysPermForm', mode, loadUrl);
+	}
+	
+	//加载Form表单数据
+	function loadForm(formId, mode, loadUrl){
+		$('#roleName').focus();
+		if(mode != 'add'){
+			$('#permPnameSeletor').attr('disabled', true);
+		}
+		//一般加载Form表单
+		commonLoadForm(formId, mode, loadUrl);
+	}
+	
+	//保存数据
+	function save(){
+		//验证数据有效性
+		if(!checkValid()){
+			return;
+ 		}
+		//按钮不可用3s，防止重复提交
+		disabledThreeSecond('#saveBtn');
+		//一般提交Form：1.弹出加载框，2.提交成功？(关闭所有弹窗，刷新页面，提示保存成功 ) : (关闭加载，提示失败)，
+		commonSubmitForm("#sysPermForm");
+	}
+	
+    //保存时,验证数据有效性
+	function checkValid(){
+    	if (isEmpty($("#permName").val().trim())) {
+			commonTips("#permName", "请输入权限名称");
+			return false;
+ 		}
+		
+		if(isNotEmpty($("#sort").val().trim())){
+			//如果排序输入非数字
+			if(/^\s*\d+\s*$/.test($("#sort").val())==false) {
+				commonTips("#sort", "请输入有效数字");
+				return false;
+			}
+ 		}
+		return true;
+	}
+	</script>
+
+	<!-- 初始化相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	//初始化
+	initData();
+	</script>
+</body>
+</html>

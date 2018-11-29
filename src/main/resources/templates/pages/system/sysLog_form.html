@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+<body>
+	<br>
+	<div class="layui-fluid">
+		<form class="layui-form" id="sysLogForm" th:action="@{/admin/sysLog/save}">
+			<input type="text" hidden="hidden" id="id" name="id" value="" />
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">操作人：</label>
+				<div class="layui-input-block">
+					<input type="text" name="operator_name" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">操作内容：</label>
+				<div class="layui-input-block">
+					<input type="text" name="content" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">操作路径：</label>
+				<div class="layui-input-block">
+					<input type="text" name="uri" class="layui-input">
+				</div>
+			</div>
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">操作参数：</label>
+				<div class="layui-input-block">
+					<textarea name="parameter" class="layui-textarea"></textarea>
+				</div>
+			</div>
+		</form>
+
+		<hr>
+		<div class="layui-form-item" style="text-align: center;">
+			<button type="button" id="saveBtn" class="layui-btn" onclick="save()">保存</button>
+			<button type="button" class="layui-btn layui-btn-primary"
+				onclick="parent.layer.closeAll()">关闭</button>
+		</div>
+	</div>
+
+	<!-- 功能相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	
+	function initData(){
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+		//根据模式和url获取数据加载表单
+		var mode = [[${mode}]];  
+       	var id = [[${id}]];
+		var loadUrl = ctxPath + "/admin/sysLog/get/"+id;
+		loadForm('#sysLogForm', mode, loadUrl);
+	}
+	
+	//加载Form表单数据
+	function loadForm(formId, mode, loadUrl){
+		//一般加载Form表单
+		commonLoadForm(formId, mode, loadUrl);
+	}
+	</script>
+	
+	<!-- 初始化相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	//初始化
+	initData();
+	</script>
+</body>
+</html>

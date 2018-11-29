@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader"></head>
+
+<body>
+	<form id="searchForm">
+		<div class="layui-form-item" style="margin-bottom: 0px;">
+			<label class="layui-form-label" >手机号码： </label>
+			<div class="layui-input-inline">
+				<input type="text" name="phone" id="phone" class="layui-input" autocomplete="off">
+			</div>
+			<label class="layui-form-label" >身份证号： </label>
+			<div class="layui-input-inline">
+				<input type="text" name="idcard" id="idcard" class="layui-input" autocomplete="off">
+			</div>
+			<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-search"></i>搜索</button>
+			<button type="button" class="layui-btn" onclick="$('#searchForm')[0].reset()"><i class="layui-icon layui-icon-refresh-1"></i>重置</button>
+			<button type="button" onclick="uploadUser()" class="layui-btn"><i class="layui-icon layui-icon-upload-circle"></i>上传用户</button>
+			<button type="button" onclick="printPage()" class="layui-btn">打印预览</button>
+		</div>
+	</form>
+	<hr style="margin:3px 0px 3px 0px; ">
+	<button type="button" class="layui-btn" onclick="add()"><i class="layui-icon layui-icon-add-1"></i>新增</button>
+	<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-refresh"></i>刷新</button>
+	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger">批量删除</button>
+	
+	<table class="layui-hide" id="userInfoTable" lay-filter="userInfoTable"></table>
+
+	<script type="text/javascript" th:inline="javascript">
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+
+		layui.use('table', function() {
+			
+			var table = layui.table;
+			table.render({
+				elem : '#userInfoTable',
+				url : ctxPath + '/admin/userInfo/pageData',
+				cellMinWidth : 80, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+				cols : [ [ 
+					{type:"numbers",width : 70, title:"序号"}
+					,{type:'checkbox'}
+					, { field : 'head_url', width : 130, title : '头像' , templet: "#headUrlTpl" }
+					, { field : 'username', width : 130, title : '注册用户名' }
+					, { field : 'real_name', width : 130, title : '真实姓名' }
+					, { field : 'phone', width : 130, title : '手机号码' }
+					, { field : 'idcard', width : 180, title : '身份证号' }
+					, { field : 'age', width : 70, title : '年龄', align:'center', sort : true }
+					, { field : 'create_time', width:180, title: '创建时间', sort: true, templet: "<div>{{layui.util.toDateString(d.create_time, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+					, { fixed : 'right', width : 200, title : '操作', align : 'center', toolbar : '#operationBar' }
+					] ],
+				page : true //是否显示分页
+				,
+				limits : [ 10, 20, 50, 100 ],
+				limit : 10
+				,done: function () {
+					//如果当前非超级管理员，则隐藏批量操作。
+					var currentRoleId = [[${session.user.roleId}]];
+					if(currentRoleId != 1){
+						$("[data-field='1']").css('display','none');
+					}
+					
+					//如果当前有图片，则调整行高
+					var item_table = table.cache['userInfoTable'];
+					for (var index in item_table) {
+					     if (item_table[index].head_url != null && item_table[index].head_url != undefined && item_table[index].head_url != '' ) {
+					    	 //改变此行高度
+					    	 $('.layui-table').find("tr:eq("+index+")").css("height", "100px");
+					    	 //改变此列内容
+					    	 var width = $('.layui-table').find("tr:eq("+index+")").find("td:eq(2) div").css('width');
+					    	 var imgContent = "<div class=\"template-image\" style=\"text-align:center; width:"+width+" \"><img src='"+ item_table[index].head_url +"' class='miniImg circleRadiu'></div>";
+					    	 $('.layui-table').find("tr:eq("+index+")").find("td:eq(2)").html(imgContent);
+					     }
+					}
+					layer.photos({
+ 			            photos : ".template-image"
+ 			         })
+		        }
+			//每页默认显示的数量
+			});
+
+			table.on('tool(userInfoTable)', function(obj) {
+				var data = obj.data; //获得当前行数据
+				var layEvent = obj.event; //获得 lay-event 对应的值
+				if (layEvent === 'view') {
+					view(data.id);
+				} else if (layEvent === 'edit') {
+					edit(data.id);
+				} else if (layEvent === 'delete') {
+					del(data.id);
+				}
+			});
+
+		});
+	</script>
+	
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
+    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete" style="margin-left:10px;">删除</button>
+	</script>
+	
+	<script th:inline="javascript">
+	function add(){
+		var title = "新增";
+		var openurl = ctxPath + "/admin/userInfo/form?mode=add";
+		commonOpen(title, openurl, "800px", "600px");
+	}
+	
+	function view(id) {
+		var title = "查看";
+		var openurl = ctxPath + "/admin/userInfo/form?mode=view&id="+id;
+		commonOpen(title, openurl, "800px", "600px");
+	}
+	
+	function edit(id) {
+		var title = "编辑";
+		var openurl = ctxPath + "/admin/userInfo/form?mode=edit&id=" + id;
+		commonOpen(title, openurl, "800px", "600px");
+	}
+	
+	function del(id) {
+		parent.layer.confirm("删除后数据不可恢复，确定需要删除吗？", {
+            btn: ["确定", "取消"]
+        }, function (){
+        	var delUrl = ctxPath + "/admin/userInfo/delete/"+id;
+        	commonDelete(delUrl);
+        })
+	}
+	
+	function search(){
+		var phone = $('#phone').val();
+		var idcard = $('#idcard').val();
+		layui.table.reload('userInfoTable',{
+			where : {
+			pageSize : 10,
+			currentPage : 1,
+			phone : phone,
+			idcard : idcard
+			}
+		})
+	}
+	
+	function uploadUser(){
+		parent.layer.msg('略');
+	}
+	
+	function printPage(){
+		parent.layer.msg('略');
+	}
+	</script>
+	
+</html>

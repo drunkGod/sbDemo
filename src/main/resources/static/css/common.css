@@ -1,0 +1,15 @@
+.redBorder {
+	border-color : red;
+}
+
+.miniImg {
+	margin : 5px;
+	width : 70px;
+	height : 70px;
+	cursor: pointer;
+}
+
+.circleRadiu {
+	border-radius:49%;
+}
+

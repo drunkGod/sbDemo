@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+<body>
+	<br>
+	<div class="layui-fluid">
+		<form class="layui-form" id="sysRoleForm" th:action="@{/admin/sysRole/save}">
+			<input type="text" hidden="hidden" id="roleId" name="roleId" value="" /> 
+			<input type="text" hidden="hidden" id="rolePerm" name="rolePerm" value="" />
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span style="color: red"> * </span>角色名称:</label>
+				<div class="layui-input-block">
+					<input type="text" id="roleName" name="roleName" autocomplete="off"
+						placeholder="请输入角色名称" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">角色描述:</label>
+				<div class="layui-input-block">
+					<input type="text" id="roleDesc" name="roleDesc" autocomplete="off"
+						placeholder="请输入角色描述" class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">角色权限:</label>
+				<div class="layui-input-block">
+					<ul id="rolePermTree" class="ztree"></ul>
+				</div>
+			</div>
+		</form>
+
+		<hr>
+		<div class="layui-form-item" style="text-align: center;">
+			<button type="button" id="saveBtn" class="layui-btn" onclick="save()">保存</button>
+			<button type="button" class="layui-btn layui-btn-primary"
+				onclick="parent.layer.closeAll()">关闭</button>
+		</div>
+	</div>
+
+	<!-- 功能相关js -->
+	<script type="text/javascript" th:inline="javascript">
+
+	function initData(){
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+		var mode = [[${mode}]];  
+        var id = [[${roleId}]];
+		//根据模式和url获取数据加载表单
+		var loadUrl = ctxPath + "/admin/sysRole/get/"+id;
+		loadForm('#sysRoleForm', mode, loadUrl);
+		//初始化角色权限树
+		var rolePerm = [[${rolePerm}]];  
+	    initTree(rolePerm);
+	}
+	
+	//加载Form表单数据
+	function loadForm(formId, mode, loadUrl){
+		$('#roleName').focus();
+		//一般加载Form表单
+		commonLoadForm(formId, mode, loadUrl);
+	}
+    
+    //保存数据
+	function save(){
+		//验证数据有效性
+		if(!checkValid()){
+			return;
+ 		}
+		//按钮不可用3s，防止重复提交
+		disabledThreeSecond('#saveBtn');
+		//获取所选中的权限：
+    	var perms = getAllSelectPerms();
+    	$('#rolePerm').val(perms);
+		//一般提交Form：1.弹出加载框，2.提交成功？(关闭所有弹窗，刷新页面，提示保存成功 ) : (关闭加载，提示失败)，
+		commonSubmitForm("#sysRoleForm");
+	}
+    
+	//保存时,验证数据有效性
+	function checkValid(){
+		if(isEmpty($("#roleName").val())){
+			commonTips("#roleName", "请输入角色名称");
+			return false;
+ 		}
+		return true;
+	}
+	
+	</script>
+
+	<!-- 权限树js -->
+	<script type="text/javascript" th:inline="javascript">
+
+    var zTreeObj = null;
+    var zNodes = null;
+    var setting = {
+        callback: {
+            onClick: zTreeOnClick
+        },
+        check : {
+        	enable: true
+        }
+    };
+
+    function zTreeOnClick(event, treeId, treeNode) {
+    	//如果点击根节点.则展开/收起所有一级节点。
+    	if(treeNode.id == null){
+    		var childrens = treeNode.children;
+    		if(childrens != null){
+    			var tmpOpen = '';
+    			for (var i = 0; i < childrens.length; i++) {
+    				var tmpNode = zTreeObj.getNodeByParam("id", childrens[i].id, null);
+    				if(i == 0){
+    					tmpOpen = tmpNode.open;
+    				}
+    				if(i == 0 || tmpNode.open == tmpOpen){
+    					zTreeObj.expandNode(tmpNode);
+    				}
+    			}
+    		}
+    	}
+    	//如果点击一级节点，则展开/收起。
+        if(treeNode.id != null && treeNode.pid == null){
+            zTreeObj.expandNode(treeNode);//展开/折叠节点
+        }
+      //如果点击二级节点，则选中/取消选中。
+        if(treeNode.id != null && treeNode.pid != null){
+        	if(!treeNode.checked){
+        		zTreeObj.checkNode(treeNode, true, true);
+        	} else {
+        		zTreeObj.checkNode(treeNode, false, true);
+        	}
+        }
+        
+    };
+
+    function initTree(rolePerm) {
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+        $.ajax({
+            url: ctxPath + "/admin/sysPermissionTree",
+            type: "post",
+            dataType: "json",
+            data: {},
+            success: function (res) {
+                if (res.code == 200) {
+                    var treeDataList = res.data;
+                    var treeData = [];
+                    for (var i = 0; i < treeDataList.length; i++) {
+                        var treeObj = {};
+                        treeObj.name = treeDataList[i].permName;
+                        treeObj.id = treeDataList[i].permId;
+                        treeObj.pid = treeDataList[i].permPid;
+                        if (treeDataList[i].children != null) {
+                            treeObj.children = getChildren(treeDataList[i].children);
+                        }
+                        treeData.push(treeObj);
+                    }
+                    if (zNodes == null) {
+                        zNodes = [
+                            {name: "根节点", open: true, id: null, children: treeData}
+                        ];
+                    }
+                    zTreeObj = $.fn.zTree.init($("#rolePermTree"), setting, zNodes);
+                    //勾选当前角色的权限
+                    if(rolePerm != null){
+                    	var permIds = rolePerm.split(',');
+                    	for(var i = 0; i < permIds.length; i++){
+                    		var tmpNode = zTreeObj.getNodeByParam("id", permIds[i], null);
+                    		//父节点不用勾选，子节点勾选后会自动勾选父节点
+                    		if(tmpNode != null && tmpNode.children == null){
+                    			zTreeObj.checkNode(tmpNode, true, true);
+                    		}
+                    		
+                    	}
+                    }
+                }
+            }
+        })
+    }
+
+    function getChildren(treeData) {
+        var sonArr = [];
+        for (var i = 0; i < treeData.length; i++) {
+            var treeObj = {};
+            treeObj.name = treeData[i].permName;
+            treeObj.id = treeData[i].permId;
+            treeObj.pid = treeData[i].permPid;
+            sonArr.push(treeObj);
+        }
+        return sonArr;
+    }
+    
+    //获取所有选中的权限
+    function getAllSelectPerms(){
+    	var perms = '';
+    	var nodes = zTreeObj.getCheckedNodes(true);
+    	for (var i = 0; i < nodes.length; i++) {
+    		if(nodes[i].id != null){
+	    		perms += nodes[i].id + ',';
+    		}
+        }
+    	if(perms != ''){
+    		perms = perms.slice(0,-1);
+    	}
+    	return perms;
+    }
+	
+	</script>
+
+	<!-- 初始化相关js -->
+	<script type="text/javascript" th:inline="javascript">
+	//初始化数据	
+	initData();
+	</script>
+
+
+</body>
+</html>

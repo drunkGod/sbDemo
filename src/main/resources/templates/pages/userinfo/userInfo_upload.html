@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader"></head>
+
+<body>
+<script type="text/javascript" th:inline="javascript">
+	var basePath = [[${#httpServletRequest.getContextPath()}]];
+    //保存
+    function save() {
+        if ($("#excel").val() == "" || document.getElementById("excel").files[0] == '请选择xls格式的文件') {
+
+            $("#excel").tips({
+                side: 3,
+                msg: '请选择文件',
+                bg: '#AE81FF',
+                time: 3
+            });
+            return false;
+        }
+
+        $("#Form").ajaxSubmit({
+				url: basePath + "/user/uploadUser",
+				type:"post",
+				dataType:"json",
+				async:false,
+				success: function (data) {
+                layer.closeAll("loading");
+                if (data.msg=="SUCCESS"){
+                    layer.msg("操作成功");
+                    window.setTimeout(function () {
+                    	parent.layer.closeAll();
+                    	//window.location.reload();
+                    }, 1200);
+                    
+                }else {
+                	console.log(data);
+                    layer.msg("系统错了小差，请稍后重试");
+                }
+            },
+            error: function () {
+                layer.closeAll("loading");
+                layer.msg("系统错了小差，请稍后重试");
+            }
+    	});
+    }
+
+    function fileType(obj) {
+        var fileType = obj.value.substr(obj.value.lastIndexOf(".")).toLowerCase();//获得文件后缀名
+        if (fileType != '.xls') {
+            $("#excel").tips({
+                side: 3,
+                msg: '请上传xls格式的文件',
+                bg: '#AE81FF',
+                time: 3
+            });
+            $("#excel").val('');
+            document.getElementById("excel").files[0] = '请选择xls格式的文件';
+        }
+    }
+
+    function closeWindow() {
+        parent.layer.closeAll();
+    }
+
+</script>
+<form name="Form" id="Form" method="post" enctype="multipart/form-data">
+    <table style="width:95%; margin-top: 15px;">
+    
+        <tr height="38px;">
+            <td><input type="file" id="excel" name="excel" onchange="fileType(this);" style="margin-left: 42px; width:210px"/></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">
+                <a class="btn btn-mini btn-primary" onclick="save();">导入</a>
+                <a class="btn btn-mini btn-danger" onclick="closeWindow();">取消</a>
+                <a class="btn btn-mini btn-success" onclick="">下载模版</a>
+            </td>
+        </tr>
+    </table>
+</form>
+
+</body>
+</html>
