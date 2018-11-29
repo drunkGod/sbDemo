@@ -120,7 +120,7 @@ public class PageData extends HashMap implements Map {
 		Set entrySet = this.entrySet();
 		for (Object entry : entrySet) {
 			Entry<Object, Object> tmpEntry = (Entry<Object, Object>)entry;
-			if(tmpEntry.getValue() != null && tmpEntry.getValue().equals("")) {
+			if(tmpEntry.getValue() != null && tmpEntry.getValue().toString().trim().length() == 0) {
 				this.put(tmpEntry.getKey(), null);
 			}
 		}
