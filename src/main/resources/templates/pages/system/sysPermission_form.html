@@ -8,8 +8,8 @@
 	<br>
 	<div class="layui-fluid">
 		<form class="layui-form" id="sysPermForm" autocomplete="off" th:action="@{/admin/sysPermission/save}">
-			<input type="text" hidden="hidden" id="permId" name="permId" value="" />
-			<input type="text" hidden="hidden" id="permPid" name="permPid" th:value="${permPid}" />
+			<input type="text" hidden="hidden" id="permId" name="permId"/>
+			<input type="text" hidden="hidden" id="permPid" name="permPid"/>
 
 			<div class="layui-form-item">
 				<label class="layui-form-label"><span style="color: red"> * </span>权限名称:</label>
@@ -116,7 +116,7 @@
 	
 	//加载Form表单数据
 	function loadForm(formId, mode, loadUrl){
-		$('#roleName').focus();
+		$('#permName').focus();
 		if(mode != 'add'){
 			$('#permPnameSeletor').attr('disabled', true);
 		}

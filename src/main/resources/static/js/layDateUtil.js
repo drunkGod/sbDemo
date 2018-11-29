@@ -6,7 +6,7 @@ function renderDate(obj, dateValue){
 		var _dateFormat = "yyyy-MM-dd";
 		//默认时间值
 		var _dateValue = null;
-		var _dateType = null;
+		var _dateType = 'date';
 		if ($(obj).attr('dateFormat') != null) {
 			_dateFormat = $(obj).attr('dateFormat');
 		}
@@ -34,7 +34,7 @@ function renderAllDate(){
 			var _dateFormat = "yyyy-MM-dd";
 			//默认时间值
 			var _dateValue = null;
-			var _dateType = null;
+			var _dateType = 'date';
 			if ($(this).attr('dateFormat') != null) {
 				_dateFormat = $(this).attr('dateFormat');
 			}

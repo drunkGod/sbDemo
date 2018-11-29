@@ -12,6 +12,8 @@
 </head>
 <body class="layui-layout-body">
 	<div class="layui-layout layui-layout-admin">
+	
+		<!-- 顶部区域 -->
 		<div class="layui-header">
 			<div class="layui-logo">Java业务管理平台</div>
 			<ul class="layui-nav layui-layout-right">
@@ -25,33 +27,47 @@
 			</ul>
 		</div>
 
+		<!-- 左侧垂直导航区域-->
 		<div class="layui-side layui-bg-black">
 			<div class="layui-side-scroll">
-				<!-- 左侧垂直导航区域-->
 				<span th:utext="${permTree}"></span>
 			</div>
 		</div>
-
-		<!--tab标签-->
-		<div class="layui-tab" lay-filter="demo" lay-allowclose="true"
-			style="margin-left: 200px;">
+		
+		<!-- 内容区固定折叠左侧 -->
+		<span style="width: 15px; top: 81px; left: 14%; z-index: 1000; position:absolute; cursor: pointer;transform:rotate(180deg)" 
+			 onmouseover="style.backgroundColor='rgb(95,184,120)';" onmouseout="style.backgroundColor='white';" title="收起左侧">
+            <i class="layui-icon layui-icon-triangle-r" style="color: grey;" id="hideLeft"></i>
+        </span>
+		<span style="width: 15px; top: 21px; left: 16px; z-index: 1000; position:absolute; cursor: pointer;"
+		 	onmouseover="style.backgroundColor='rgb(95,184,120)';" onmouseout="style.backgroundColor='white';" title="展开左侧">
+			<i class="layui-icon layui-icon-triangle-r" style="display: none; color: grey;" id="showLeft"></i>
+        </span>
+	        
+		<!--内容区-->
+		<div class="layui-tab" id="mainContent" lay-filter="demo" lay-allowclose="true" style="width:87%; margin-left: 13%;">
+			<!--内容区头部Tab标签-->
 			<ul class="layui-tab-title">
-			    <li class="layui-this" lay-id="111"><i class="layui-icon">&#xe68e;</i><cite>首页</cite><p class="layui-tab-close" style="display: none;"></p></li>
+				<!-- 内容区固定首页 -->
+			    <li class="layui-this" lay-id="111" style="margin-left:9px;"><i class="layui-icon">&#xe68e;</i><cite>首页</cite><p class="layui-tab-close" style="display: none;"></p></li>
 			</ul>
+			<!--内容区头部Tab右键菜单-->
 			<ul class="rightmenu" style="width: 152px; top: 27px; left: 262px; z-index: 1000; position:absolute; display: none; background-color: white; border: solid 1px rgb(242,242,242)">
 	            <li data-type="closethis" onmouseover="style.backgroundColor='rgb(95,184,120)';style.color='white'" onmouseout="style.backgroundColor='white';style.color='black'" ><span style="margin-left: 6px;">&nbsp;</span><i class="layui-icon layui-icon-close"></i>关闭当前</li>
 	            <li data-type="closeother" onmouseover="style.backgroundColor='rgb(95,184,120)';style.color='white'" onmouseout="style.backgroundColor='white';style.color='black'" ><span style="margin-left: 6px;">&nbsp;</span><i class="layui-icon layui-icon-close"></i>关闭其它</li>
 	            <li data-type="closeall" onmouseover="style.backgroundColor='rgb(95,184,120)';style.color='white'" onmouseout="style.backgroundColor='white';style.color='black'" ><span style="margin-left: 6px;">&nbsp;<i class="layui-icon layui-icon-close"></i></span>关闭所有</li>
 	        </ul>
+	        
+	        <!--内容区具体内容-->
 			<div class="layui-tab-content">
 				<div class="layui-tab-item layui-show" lay-id="1">
-                    <iframe id='indexIframe' th:src="@{/admin/home/page}" scrolling="auto" style="width:100%;height:99%;" frameborder="0" ></iframe>
+                    <iframe id='indexIframe' th:src="@{/admin/home/page}" scrolling="auto" style="width:100%;height:555px;" frameborder="0" ></iframe>
                 </div>
 			</div>
 		</div>
 
+		<!-- 底部固定区域 -->
 		<div class="layui-footer" style="text-align: center;">
-			<!-- 底部固定区域 -->
 			© java小兵 测试管理平台
 		</div>
 	</div>
@@ -196,6 +212,26 @@
 		
 		    $('.rightmenu').hide();
 		})
+		
+		$('#hideLeft').click(function(){
+			$('.layui-side.layui-bg-black').hide();
+			$('#mainContent').css('margin-left', '0px');
+			$('#mainContent').css('width', '100%');
+			$('#hideLeft').css('display', 'none');
+			$('#showLeft').css('display', 'block');
+			$('.layui-header').css('display', 'none')
+			$('.layui-footer').css('display', 'none');
+		});
+		
+		$('#showLeft').click(function(){
+			$('.layui-side.layui-bg-black').show();
+			$('#mainContent').css('margin-left', '13%');
+			$('#mainContent').css('width', '87%');
+			$('#hideLeft').css('display', 'block');
+			$('#showLeft').css('display', 'none');
+			$('.layui-header').css('display', 'block')
+			$('.layui-footer').css('display', 'block')
+		});
 	      
     });
 </script>
