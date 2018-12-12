@@ -24,11 +24,11 @@ public class CodeGenerate {
 	public static List<String> tableInfoList = new ArrayList<String>();
 	
 	/** 数据库表名称 */
-	private static final String TABLE_NAME = "test_gen";
+	private static final String TABLE_NAME = "sys_log";
 	/** 表对应的类名名称 */
-	private static final String ENTITY_NAME = "TestGen";
+	private static final String ENTITY_NAME = "SysLog";
 	/** 类所在的模块名，即modules下的一级文件夹 */
-	private static final String MODULE_NAME = "tg";
+	private static final String MODULE_NAME = "system";
 	/** 生成代码所在的位置。如果需要，可以设置直接生成到项目中。 */
 	private static final String TARGET_DIR = "D:\\codeGen\\sbDemo";
 	
@@ -294,9 +294,21 @@ public class CodeGenerate {
 				+ "		</div>\r\n" 
 				+ "	</form>\r\n" 
 				+ "	<hr style=\"margin:3px 0px 3px 0px; \">\r\n"
-				+ "	<button type=\"button\" class=\"layui-btn\" onclick=\"add()\"><i class=\"layui-icon layui-icon-add-1\"></i>新增</button>\r\n"
-				+ "	<button type=\"button\" class=\"layui-btn\" onclick=\"search()\"><i class=\"layui-icon layui-icon-refresh\"></i>刷新</button>\r\n"
+				+ "	\n" + 
+				"	<script type=\"text/html\" id=\"headToolBar\">\n" + 
+				"  		<div class=\"layui-btn-container\">\n" + 
+				"   		 <button class=\"layui-btn\" lay-event=\"add\"><i class=\"layui-icon layui-icon-add-1\"></i>新增</button>\n" + 
+				"   		 <button class=\"layui-btn\" lay-event=\"fresh\"><i class=\"layui-icon layui-icon-refresh\"></i>刷新</button>\n" + 
+				"  		</div>\n" + 
+				"	</script>\r\n"
 				+ "	\r\n" 
+				+ "	<script type=\"text/html\" id=\"operationBar\">\r\n"
+				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-primary layui-btn-xs\" lay-event=\"view\">查看</button>\r\n"
+				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-xs\" lay-event=\"edit\">编辑</button>\r\n"
+				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-danger layui-btn-xs\"  lay-event=\"delete\"><i class=\"layui-icon layui-icon-delete\"></i>删除</button>\r\n"
+				+ "	</script>\r\n" 
+				+ "	\r\n" 
+				+ "	<!-- table主体  -->" 
 				+ "	<table class=\"layui-hide\" id=\"" + entityNameLower + "Table\" lay-filter=\"" + entityNameLower + "Table\"></table>\r\n" 
 				+ "	\r\n"
 				+ "	<script type=\"text/javascript\" th:inline=\"javascript\">\r\n"
@@ -305,6 +317,7 @@ public class CodeGenerate {
 				+ "	  var table = layui.table;\r\n" 
 				+ "	  table.render({\r\n"
 				+ "	    elem: '#" + entityNameLower + "Table'\r\n" 
+				+ "	    ,toolbar: '#headToolBar'\r\n" 
 				+ "	    ,url: ctxPath + '/admin/" + entityNameLower + "/pageData'\r\n" 
 				+ "	    ,cols: [ [\r\n" 
 				+ "	       {type:\"numbers\",width : 70, title:\"序号\"}\r\n";
@@ -324,6 +337,17 @@ public class CodeGenerate {
 				+ "		  ,limit: 10 //每页默认显示的数量\r\n" 
 				+ "	  });\r\n" 
 				+ "	  \r\n" 
+				+ "	  table.on('toolbar(" + entityNameLower + "Table)', function(obj) {\r\n" +
+				"			var data = obj.data; //获得当前行数据\r\n" + 
+				"			var layEvent = obj.event; //获得 lay-event 对应的值\n" + 
+				"			if (layEvent === 'add') {\r\n" + 
+				"				add();\r\n" + 
+				"			} else if (layEvent === 'fresh') {\r\n" + 
+				"				reloadCurrentIFrame();\r\n" + 
+				"			}\r\n" + 
+				"	  });\r\n" 
+				+ "	  \r\n" 
+				+ "	  //监听table行中的event,lay-event\r\n" 
 				+ "	  table.on('tool(" + entityNameLower + "Table)', function(obj) {\r\n" 
 				+ "			var data = obj.data; //获得当前行数据\r\n"
 				+ "			var layEvent = obj.event; //获得 lay-event 对应的值\r\n"
@@ -336,12 +360,6 @@ public class CodeGenerate {
 				+ "	});\r\n" 
 				+ "	</script>\r\n" 
 				+ "\r\n"
-				+ "	<script type=\"text/html\" id=\"operationBar\">\r\n"
-				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-primary layui-btn-xs\" lay-event=\"view\">查看</button>\r\n"
-				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-xs\" lay-event=\"edit\">编辑</button>\r\n"
-				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-danger layui-btn-xs\"  lay-event=\"delete\">删除</button>\r\n"
-				+ "	</script>\r\n" 
-				+ "	\r\n" 
 				+ "	<script th:inline=\"javascript\">\r\n" 
 				+ "	function add(){\r\n"
 				+ "		var title = \"新增\";\r\n" 

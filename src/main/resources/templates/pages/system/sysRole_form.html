@@ -97,44 +97,14 @@
     var zTreeObj = null;
     var zNodes = null;
     var setting = {
+    	//点击节点回调函数
         callback: {
             onClick: zTreeOnClick
         },
+        //打开复选框
         check : {
         	enable: true
         }
-    };
-
-    function zTreeOnClick(event, treeId, treeNode) {
-    	//如果点击根节点.则展开/收起所有一级节点。
-    	if(treeNode.id == null){
-    		var childrens = treeNode.children;
-    		if(childrens != null){
-    			var tmpOpen = '';
-    			for (var i = 0; i < childrens.length; i++) {
-    				var tmpNode = zTreeObj.getNodeByParam("id", childrens[i].id, null);
-    				if(i == 0){
-    					tmpOpen = tmpNode.open;
-    				}
-    				if(i == 0 || tmpNode.open == tmpOpen){
-    					zTreeObj.expandNode(tmpNode);
-    				}
-    			}
-    		}
-    	}
-    	//如果点击一级节点，则展开/收起。
-        if(treeNode.id != null && treeNode.pid == null){
-            zTreeObj.expandNode(treeNode);//展开/折叠节点
-        }
-      //如果点击二级节点，则选中/取消选中。
-        if(treeNode.id != null && treeNode.pid != null){
-        	if(!treeNode.checked){
-        		zTreeObj.checkNode(treeNode, true, true);
-        	} else {
-        		zTreeObj.checkNode(treeNode, false, true);
-        	}
-        }
-        
     };
 
     function initTree(rolePerm) {
@@ -192,6 +162,39 @@
         }
         return sonArr;
     }
+    
+
+    function zTreeOnClick(event, treeId, treeNode) {
+    	//如果点击根节点.则展开/收起所有一级节点。
+    	if(treeNode.id == null){
+    		var childrens = treeNode.children;
+    		if(childrens != null){
+    			var tmpOpen = '';
+    			for (var i = 0; i < childrens.length; i++) {
+    				var tmpNode = zTreeObj.getNodeByParam("id", childrens[i].id, null);
+    				if(i == 0){
+    					tmpOpen = tmpNode.open;
+    				}
+    				if(i == 0 || tmpNode.open == tmpOpen){
+    					zTreeObj.expandNode(tmpNode);
+    				}
+    			}
+    		}
+    	}
+    	//如果点击一级节点，则展开/收起。
+        if(treeNode.id != null && treeNode.pid == null){
+            zTreeObj.expandNode(treeNode);//展开/折叠节点
+        }
+      //如果点击二级节点，则选中/取消选中。
+        if(treeNode.id != null && treeNode.pid != null){
+        	if(!treeNode.checked){
+        		zTreeObj.checkNode(treeNode, true, true);
+        	} else {
+        		zTreeObj.checkNode(treeNode, false, true);
+        	}
+        }
+        
+    };
     
     //获取所有选中的权限
     function getAllSelectPerms(){

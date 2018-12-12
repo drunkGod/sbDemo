@@ -25,7 +25,9 @@ public class SysLogServiceImpl implements ISysLogService {
 		PageHelper.startPage(page, limit);
 		String operator_name = pd.getString("operator_name");
 		String content = pd.getString("content");
-		List<PageData> list = sysLogMapper.getTablePageData(operator_name, content);
+		String createTimeStart = pd.getString("createTimeStart");
+		String createTimeEnd = pd.getString("createTimeEnd");
+		List<PageData> list = sysLogMapper.getTablePageData(operator_name, content, createTimeStart, createTimeEnd);
 		PageInfo<PageData> pageInfo = new PageInfo<>(list);
 		JSONObject pageJson = LayuiPageUtil.getLayuiPage(pageInfo);
 		return pageJson;

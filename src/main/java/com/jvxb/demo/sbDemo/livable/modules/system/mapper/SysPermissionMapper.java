@@ -15,9 +15,11 @@ import com.jvxb.demo.sbDemo.livable.utils.PageData;
 @Mapper
 public interface SysPermissionMapper extends BaseMapper{
 
-	@Select("SELECT sp.perm_id as id, sp.perm_id as permId, sp.perm_pid as parentId, sp.perm_pid as permPid, "
-			+ " sp.perm_name as permName, sp.perm_desc as permDesc, sp.perm_url as permUrl, sp.is_show as isShow, "
-			+ " sp.create_time as createTime FROM sys_permission sp")
+	@Select("SELECT sp.perm_id as id, sp.perm_pid as parentId, sp.perm_name as name,"
+			+ " sp.perm_id as permId, sp.perm_pid as permPid, sp.perm_name as permName,"
+			+ " sp.perm_desc as permDesc, sp.perm_url as permUrl, sp.is_show as isShow, "
+			+ " sp.create_time as createTime "
+			+ "FROM sys_permission sp")
 	List<SysPermission> getSysPermissionList();
 
 	@SelectProvider(type = SysPermissionMapperProvider.class, method = "getPermissionBySysUserId")

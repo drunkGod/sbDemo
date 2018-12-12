@@ -18,13 +18,22 @@
 			<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-search"></i>搜索</button>
 			<button type="button" class="layui-btn" onclick="$('#searchForm')[0].reset()"><i class="layui-icon layui-icon-refresh-1"></i>重置</button>
 			<button type="button" onclick="uploadUser()" class="layui-btn"><i class="layui-icon layui-icon-upload-circle"></i>上传用户</button>
-			<button type="button" onclick="printPage()" class="layui-btn">打印预览</button>
 		</div>
 	</form>
-	<hr style="margin:3px 0px 3px 0px; ">
-	<button type="button" class="layui-btn" onclick="add()"><i class="layui-icon layui-icon-add-1"></i>新增</button>
-	<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-refresh"></i>刷新</button>
-	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger">批量删除</button>
+	
+	<script type="text/html" id="headToolBar">
+  		<div class="layui-btn-container">
+   		 <button class="layui-btn  layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-1"></i>新增</button>
+   		 <button class="layui-btn  layui-btn-sm" lay-event="fresh"><i class="layui-icon layui-icon-refresh"></i>刷新</button>
+   		 <button th:if="${session.user.roleId eq 1}" lay-event="batchDel" class="layui-btn layui-btn-danger  layui-btn-sm"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+  		</div>
+	</script>
+	
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
+    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</button>
+	</script>
 	
 	<table class="layui-hide" id="userInfoTable" lay-filter="userInfoTable"></table>
 
@@ -36,18 +45,19 @@
 			var table = layui.table;
 			table.render({
 				elem : '#userInfoTable',
+				toolbar: '#headToolBar',
 				url : ctxPath + '/admin/userInfo/pageData',
 				cellMinWidth : 80, //全局定义常规单元格的最小宽度，layui 2.2.1 新增
 				cols : [ [ 
-					{type:"numbers",width : 70, title:"序号"}
+					{type:"numbers", width : 70, title:"序号"}
 					,{type:'checkbox'}
 					, { field : 'head_url', width : 130, title : '头像' , templet: "#headUrlTpl" }
 					, { field : 'username', width : 130, title : '注册用户名' }
 					, { field : 'real_name', width : 130, title : '真实姓名' }
 					, { field : 'phone', width : 130, title : '手机号码' }
 					, { field : 'idcard', width : 180, title : '身份证号' }
-					, { field : 'age', width : 70, title : '年龄', align:'center', sort : true }
-					, { field : 'create_time', width:180, title: '创建时间', sort: true, templet: "<div>{{layui.util.toDateString(d.create_time, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+					, { field : 'age', width : 70, title : '年龄', align:'center'}
+					, { field : 'create_time', width:180, title: '创建时间', templet: "<div>{{layui.util.toDateString(d.create_time, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
 					, { fixed : 'right', width : 200, title : '操作', align : 'center', toolbar : '#operationBar' }
 					] ],
 				page : true //是否显示分页
@@ -73,12 +83,23 @@
 					    	 $('.layui-table').find("tr:eq("+index+")").find("td:eq(2)").html(imgContent);
 					     }
 					}
+					//渲染图片
 					layer.photos({
  			            photos : ".template-image"
  			         })
 		        }
 			//每页默认显示的数量
 			});
+			
+			table.on('toolbar(userInfoTable)', function(obj) {
+				var data = obj.data; //获得当前行数据
+				var layEvent = obj.event; //获得 lay-event 对应的值
+				if (layEvent === 'add') {
+					add();
+				} else if (layEvent === 'fresh') {
+					reloadCurrentIFrame();
+				}
+			 });
 
 			table.on('tool(userInfoTable)', function(obj) {
 				var data = obj.data; //获得当前行数据
@@ -93,12 +114,6 @@
 			});
 
 		});
-	</script>
-	
-	<script type="text/html" id="operationBar">
-    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
-    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
-    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete" style="margin-left:10px;">删除</button>
 	</script>
 	
 	<script th:inline="javascript">

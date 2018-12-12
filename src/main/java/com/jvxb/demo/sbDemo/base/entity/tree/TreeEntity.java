@@ -14,6 +14,8 @@ public abstract class TreeEntity<T extends TreeEntity> {
 	private Integer id;
 
 	private Integer parentId;
+	
+	private String name;
 
 	private List<T> children;
 
@@ -33,6 +35,14 @@ public abstract class TreeEntity<T extends TreeEntity> {
 		this.parentId = parentId;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public List<T> getChildren() {
 		return children;
 	}

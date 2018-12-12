@@ -108,7 +108,8 @@ function commonOpen(title, openUrl, width, height) {
 	parent.layer.open({
 		  type: 2,
 		  title: title,
-		  shadeClose: true,
+		  shadeClose: false,
+		  maxmin: true,
 		  skin: 'layer-ext-moon',
 		  shade: 0.2,
 		  area: [width, height],
@@ -131,7 +132,7 @@ function commonTips(selector, msg){
 }
 
 //一般提示
-function commonShowMsg(msg){
+function commonMsg(msg){
 	parent.layer.msg(msg);
 }
 
@@ -221,7 +222,11 @@ function commonSubmitForm(formId){
 		}else{
 			//关闭加载，提示失败
 			parent.layer.closeAll('loading');
-			layer.msg('保存失败！', {icon:5, time: 2*1000});
+			if(res.message != null && res.message != '') {
+				parent.layer.msg( res.message, {icon:5, time: 2*1000});
+			} else {
+				parent.layer.msg('保存失败！', {icon:5, time: 2*1000});
+			}
 		}
 	});
 }

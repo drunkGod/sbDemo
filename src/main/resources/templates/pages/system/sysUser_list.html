@@ -32,25 +32,34 @@
 			</button>
 		</div>
 	</form>
-	<hr style="margin: 3px 0px 3px 0px;">
-	<button type="button" class="layui-btn" onclick="add()">
-		<i class="layui-icon layui-icon-add-1"></i>新增
-	</button>
-	<button type="button" class="layui-btn" onclick="search()">
-		<i class="layui-icon layui-icon-refresh"></i>刷新
-	</button>
-
+	
+	<script type="text/html" id="headToolBar">
+  		<div class="layui-btn-container">
+   		 <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon layui-icon-add-1"></i>新增</button>
+   		 <button class="layui-btn layui-btn-sm" lay-event="fresh"><i class="layui-icon layui-icon-refresh"></i>刷新</button>
+  		</div>
+	</script>
+	
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
+    	<button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modifyPassword">修改密码</button>
+    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</button>
+	</script>
+	
+	<!-- table主体 -->
 	<table class="layui-hide" id="sysUserTable" lay-filter="sysUserTable"></table>
 
 	<script type="text/javascript" th:inline="javascript">
 	var ctxPath = [[${#httpServletRequest.getContextPath()}]];
 	
-	
 	layui.use('table', function(){
 	  var table = layui.table;
+	  var form = layui.form;
 	  
 	  table.render({
 	    elem: '#sysUserTable'
+	    ,toolbar: '#headToolBar'
 	    ,url: ctxPath + '/admin/sysUser/pageData'
 	    ,cols: [ [
 	       {type:"numbers",width : 70, title:"序号"}
@@ -58,10 +67,8 @@
 	      ,{field:'realName', width:150, title: '真实姓名'}
 	      ,{field:'roleName', width:150, title: '所属角色'}
 	      ,{field:'phone', width:150, title: '手机号码'}
-	      ,{field:'valid', width:100, title: '是否有效', align:'center', templet: 
-	    	  function(d){return d.valid == "1" ? '<span class="layui-badge layui-bg-blue">是</span>' : '<span class="layui-badge layui-bg-gray">否</span>';}}
+	      ,{field:'valid', width:100, title: '是否有效', align:'center', templet: '#validTpl'}
 	      ,{field:'createTime', width:180, title: '创建时间', sort: true, templet: "<div>{{layui.util.toDateString(d.createTime, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
-
 	      ,{fixed : 'right',title : '操作',width : 250,align : 'center',toolbar : '#operationBar'}
 	    ] ]
 		  ,page: true //是否显示分页
@@ -69,34 +76,64 @@
 		  ,limit: 10 //每页默认显示的数量
 	  });
 	  
-	  table.on('tool(sysUserTable)', function(obj) {
+	  table.on('toolbar(sysUserTable)', function(obj) {
 			var data = obj.data; //获得当前行数据
 			var layEvent = obj.event; //获得 lay-event 对应的值
-			if (layEvent === 'view') {
-				view(data.id, data.roleId);
-			} else if (layEvent === 'edit') {
-				edit(data.id, data.roleId);
-			} else if (layEvent === 'delete') {
-				if(data.id==1){
-					parent.layer.msg('暂不支持删除admin用户！',{icon:6});
-					return;
-				}
-				del(data.id, data.roleId);
-			} else if (layEvent === 'modifyPassword') {
-				parent.layer.msg('暂不支持修改密码',{icon:6});
+			if (layEvent === 'add') {
+				add();
+			} else if (layEvent === 'fresh') {
+				reloadCurrentIFrame();
 			}
-		});
+	  });
 	  
+	  //监听table行中的event,lay-event
+	  table.on('tool(sysUserTable)', function(obj) {
+		var data = obj.data; //获得当前行数据
+		var layEvent = obj.event; //获得 lay-event 对应的值
+		if (layEvent === 'view') {
+			view(data.id, data.roleId);
+		} else if (layEvent === 'edit') {
+			edit(data.id, data.roleId);
+		} else if (layEvent === 'delete') {
+			if(data.id==1){
+				parent.layer.msg('暂不支持删除admin用户！',{icon:6});
+				return;
+			}
+			del(data.id, data.roleId);
+		} else if (layEvent === 'modifyPassword') {
+			parent.layer.msg('暂不支持修改密码',{icon:6});
+		}
+	  });
+	  
+	  //监听指定开关
+	  form.on('switch(switchTest)', function(data){
+	  	var id = $(this).attr('data-id');
+	 	var valid = this.checked ? '1' : '0';
+	  	//获取当前行的id，vilid.点击发送ajax到后台
+	 	$.ajax({
+	           type: 'POST',
+	           url: ctxPath + '/admin/sysUser/save',
+	           data: {id: id, valid: valid},
+	           dataType: 'json',
+	           success: function (res) {
+	           	if (res.code == 200) {
+	            	parent.layer.msg('修改成功', {icon:6, time:2000});
+	           	}
+	           },
+	           error: function (res) {
+	           	parent.layer.msg('修改失败', {icon:5, time:2000});
+	           	console.log(res);
+	           }
+	       });
+	
+	  });
 	});
 	</script>
 
-	<script type="text/html" id="operationBar">
-    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
-    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
-    	<button type="button" class="layui-btn layui-btn-xs layui-btn-normal" lay-event="modifyPassword">修改密码</button>
-    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete">删除</button>
+	<script type="text/html" id="validTpl">
+		<input type="checkbox" name="valid" lay-skin="switch" data-id="{{d.id}}" lay-filter="switchTest" lay-text="是|否" {{d.valid=="1"?"checked":""}}>
 	</script>
-
+	  
 	<script th:inline="javascript">
 	
 	function add(){
