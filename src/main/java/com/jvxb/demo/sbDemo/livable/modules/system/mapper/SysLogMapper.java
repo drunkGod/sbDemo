@@ -15,7 +15,8 @@ import com.jvxb.demo.sbDemo.livable.utils.PageData;
 public interface SysLogMapper extends BaseMapper{
 
 	@SelectProvider(type = SysLogMapperProvider.class, method = "getTablePageData")
-	List<PageData> getTablePageData(@Param("operator_name") String operator_name, @Param("content") String content);
+	List<PageData> getTablePageData(@Param("operator_name") String operator_name, @Param("content") String content,
+				@Param("createTimeStart") String createTimeStart, @Param("createTimeEnd") String createTimeEnd);
 
 	@InsertProvider(type = SysLogMapperProvider.class, method = "insertOrUpdate")
 	void insertOrUpdate(PageData pd);

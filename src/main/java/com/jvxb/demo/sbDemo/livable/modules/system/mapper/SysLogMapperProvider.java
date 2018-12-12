@@ -1,20 +1,25 @@
 package com.jvxb.demo.sbDemo.livable.modules.system.mapper;
 
-import com.jvxb.demo.sbDemo.livable.utils.PageData;
 import com.jvxb.demo.sbDemo.livable.utils.CommonUtil;
-import com.jvxb.demo.sbDemo.livable.utils.DateUtil;
+import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 public class SysLogMapperProvider {
 
 	private String column = "id, content, uri, parameter, operator_id, operator_name, create_time";
 
-	public String getTablePageData(String operator_name, String content) {
+	public String getTablePageData(String operator_name, String content, String createTimeStart, String createTimeEnd) {
         String sql = "select " + column + " from sys_log where 1 = 1 ";
-		if (operator_name != null && operator_name.length() > 0) {
+		if (CommonUtil.notNullOrEmpty(operator_name)) {
 			sql += "and operator_name like concat('%', #{operator_name}, '%')  ";
 		}
-		if (content != null && content.length() > 0) {
+		if (CommonUtil.notNullOrEmpty(content)) {
 			sql += "and content like concat('%', #{content}, '%')  ";
+		}
+		if (CommonUtil.notNullOrEmpty(createTimeStart)) {
+			sql += "and create_time >= #{createTimeStart} ";
+		}
+		if (CommonUtil.notNullOrEmpty(createTimeEnd)) {
+			sql += "and create_time <= #{createTimeEnd} ";
 		}
 		sql += " order by create_time desc";
 		return sql;

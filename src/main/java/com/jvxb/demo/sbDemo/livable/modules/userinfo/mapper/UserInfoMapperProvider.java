@@ -171,7 +171,8 @@ public class UserInfoMapperProvider {
 	}
 
 	public String get(PageData pd) {
-		String sql = "select * from live_user_info where id = #{id}";
+		String sql = "select "+"id, username, real_name, password, phone, idcard, DATE_FORMAT(birthday, '%Y-%m-%d') birthday, age, gender, hobby, locate_province,"
+	    		+ " locate_city, locate_area, address, remark, head_url, photo_url, create_by, create_time, update_by, update_time"+" from live_user_info where id = #{id}";
 		return sql;
 	}
 

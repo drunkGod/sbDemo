@@ -49,7 +49,7 @@
 	<script type="text/html" id="operationBar">
     	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
     	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
-    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete">删除</button>
+    	<button th:if="${session.user.roleId eq 1}" type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</button>
 	</script>
 
 	<script type="text/javascript" th:inline="javascript">
@@ -168,15 +168,57 @@
 
     var zTreeObj = null;
     var zNodes = null;
-    // zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
-    var globTreeData = [];
     // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
     var setting = {
+    	//点击节点回调函数
         callback: {
             onClick: zTreeOnClick
         }
     };
 
+    function initTree() {
+        $.ajax({
+            url: ctxPath + "/admin/sysPermissionTree",
+            type: "post",
+            dataType: "json",
+            data: {},
+            success: function (res) {
+                if (res.code == 200) {
+                	var treeDataList = res.data;
+                    var treeData = [];
+                    for (var i = 0; i < treeDataList.length; i++) {
+                        var treeObj = {};
+                        treeObj.name = treeDataList[i].name;
+                        treeObj.id = treeDataList[i].id;
+                        treeObj.pid = treeDataList[i].parentId;
+                        if (treeDataList[i].children != null) {
+                            treeObj.children = getChildren(treeDataList[i].children);
+                        }
+                        treeData.push(treeObj);
+                    }
+                    if (zNodes == null) {
+                        zNodes = [
+                            {name: "根节点", open: true, id: null, children: treeData}
+                        ];
+                    }
+                    zTreeObj = $.fn.zTree.init($("#permTree"), setting, zNodes);
+                }
+            }
+        })
+    }
+
+    function getChildren(treeData) {
+        var sonArr = [];
+        for (var i = 0; i < treeData.length; i++) {
+            var treeObj = {};
+            treeObj.name = treeData[i].permName;
+            treeObj.id = treeData[i].permId;
+            treeObj.pid = treeData[i].permPid;
+            sonArr.push(treeObj);
+        }
+        return sonArr;
+    }
+    
     var reloadTable;
     layui.use(['table'], function () {//layui 模块引用，根据需要自行修改
         var table = layui.table;
@@ -200,48 +242,6 @@
         currentTree = treeNode;
         reloadTable(treeNode);
     };
-
-    function initTree() {
-        $.ajax({
-            url: ctxPath + "/admin/sysPermissionTree",
-            type: "post",
-            dataType: "json",
-            data: {},
-            success: function (res) {
-                if (res.code == 200) {
-                    var qcdata = res.data;
-                    for (var i = 0; i < qcdata.length; i++) {
-                        var treeObj = {};
-                        treeObj.name = qcdata[i].permName;
-                        treeObj.id = qcdata[i].permId;
-                        treeObj.pid = qcdata[i].permPid;
-                        if (qcdata[i].children != null) {
-                            treeObj.children = getChildren(qcdata[i].children);
-                        }
-                        globTreeData.push(treeObj);
-                    }
-                    if (zNodes == null) {
-                        zNodes = [
-                            {name: "根节点", open: true, id: null, children: globTreeData}
-                        ];
-                    }
-                    zTreeObj = $.fn.zTree.init($("#permTree"), setting, zNodes);
-                }
-            }
-        })
-    }
-
-    function getChildren(qcdata) {
-        var sonArr = [];
-        for (var i = 0; i < qcdata.length; i++) {
-            var treeObj = {};
-            treeObj.name = qcdata[i].permName;
-            treeObj.id = qcdata[i].permId;
-            treeObj.pid = qcdata[i].permPid;
-            sonArr.push(treeObj);
-        }
-        return sonArr;
-    }
 
     $(document).ready(function () {
         initTree();

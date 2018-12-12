@@ -177,13 +177,12 @@
 	                //上传完毕回调
 	                layer.closeAll('loading'); //关闭loading
 	                if (res.code == 200) {
-	                	console.log(res.data);
                          if ($("#head_url").val().length == 0) {
                              $("#head_url").val(res.data);
                          } else {
                              $("#head_url").val($("#head_url").val() + "," + res.data);
                          }
-                         $(".template-image").append('<img src="' + res.data + '" height="70px;">');
+                         $(".template-image").append('<img src="' + res.data + '" class="miniImg">');
                          layer.photos({
      			            photos : ".template-image"
      			         })
@@ -191,7 +190,7 @@
 	            }
 	            , error: function (index) {
 	                //请求异常回调
-	                alert('第' + (index + 1) + '图片上传失败，请重试');
+	                layer.alert('第' + (index + 1) + '图片上传失败，请重试');
 	                layer.closeAll('loading'); //关闭loading
 	            }
 	        });
@@ -219,7 +218,7 @@
                          } else {
                              $("#photo_url").val($("#photo_url").val() + "," + res.data);
                          }
-                         $(".template-image2").append('<img src="' + res.data + '" height="70px;">');
+                         $(".template-image2").append('<img src="' + res.data + '" class="miniImg">');
                          layer.photos({
      			            photos : ".template-image2"
      			         })
@@ -227,7 +226,7 @@
 	            }
 	            , error: function (index) {
 	                //请求异常回调
-	                alert('第' + (index + 1) + '图片上传失败，请重试');
+	                layer.alert('第' + (index + 1) + '图片上传失败，请重试');
 	                layer.closeAll('loading'); //关闭loading
 	            }
 	        });
@@ -305,6 +304,7 @@
 	<script type="text/javascript" th:inline="javascript">
 	//初始化数据
 	initData();
+	//渲染图片
 	layer.photos({
       photos : ".template-image"
     })
