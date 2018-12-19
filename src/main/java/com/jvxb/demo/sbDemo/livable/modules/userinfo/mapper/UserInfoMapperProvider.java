@@ -1,5 +1,7 @@
 package com.jvxb.demo.sbDemo.livable.modules.userinfo.mapper;
 
+import java.util.List;
+
 import com.jvxb.demo.sbDemo.livable.utils.CommonUtil;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
@@ -180,5 +182,20 @@ public class UserInfoMapperProvider {
 		String sql = "select * from live_user_info";
 		return sql;
 	}
+	
+	public String insertBatch(List<PageData> listPd) {
+        String sql = "";
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("insert into live_user_info (username, password) values");
+        for(PageData pd: listPd){
+			if(pd !=null && pd.get("var0") !=null){
+				String username = pd.getString("var0");
+				String password = "123456";
+				sqlBuilder.append("('" + username +"','"+password+"'),");
+			}
+		}
+        sql = CommonUtil.trimLastDot(sqlBuilder.toString());
+        return sql;
+    }
 
 }

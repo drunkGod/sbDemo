@@ -18,15 +18,15 @@
 			<div class="layui-logo">Java业务管理平台</div>
 			<ul class="layui-nav layui-layout-right">
 				<li class="layui-nav-item">
-				    <a href="javascript:;">欢迎光临，<span th:text="${session.user.username}"></span></a>
+				    <a href="javascript:;"><img src="../../../static/img/default.png" class="layui-nav-img"><span th:text="${session.user.username}"></span></a>
 				    <dl class="layui-nav-child">
-				      <dd><a href="javascript:;">修改密码</a></dd>
+				      <dd><a href="javascript:;" onclick="openPasswordPage();">修改密码</a></dd>
 				      <dd><a th:href="@{/admin/logout}">安全退出</a></dd>
 				    </dl>
 				  </li>
 			</ul>
 		</div>
-
+		
 		<!-- 左侧垂直导航区域-->
 		<div class="layui-side layui-bg-black">
 			<div class="layui-side-scroll">
@@ -73,10 +73,11 @@
 	</div>
 	<script th:src="@{/static/plugin/layui/layui.js}"></script>
 	<script>
+	var layer, $;
     layui.use(['element', 'layer', 'jquery'], function () {
         var element = layui.element;
-        // var layer = layui.layer;
-        var $ = layui.$;
+        layer = layui.layer;
+        $ = layui.$;
         // 配置tab实践在下面无法获取到菜单元素
         $('.site-demo-active').on('click', function () {
             var dataid = $(this);
@@ -157,37 +158,38 @@
                 })
             }
         };
+        
         function FrameWH() {
             var h = $(window).height();
             $("iframe").css("height",(h-149)+"px");
             $(".layui-tab-content").css("height",(h-149)+"px");
         }
         
-      //绑定右键菜单
-      function CustomRightClick(id) {
-          //取消右键 
-          $('.layui-tab-title,.layui-tab-title li').click(function () {
-              $('.rightmenu').hide();
-          });
-          
-          //桌面点击右击 
-          $('.layui-tab-title li').on('contextmenu', function (e) {
-              var popupmenu = $(".rightmenu");
-              var target = $(e.target);
-              popupmenu.find("li").attr("lay-id",target.attr("lay-id"));
-              leftPos = target.offset().left;
-              topPos = target.offset().top + target.height();
-              popupmenu.css({ left: leftPos, top: topPos }).show();
-            	//点击空白处，设置弹框消失。此处仍有问题，点击iframe无法进入方法。
-              var flag = true;
-              $(document).bind("click",function(e){
-                if(target.closest(popupmenu).length == 0 && flag == true){
-                	$('.rightmenu').hide();
-                	flag = false;
-                }
-              });
-              return false;
-          });
+		//绑定右键菜单
+		function CustomRightClick(id) {
+	        //取消右键 
+	        $('.layui-tab-title,.layui-tab-title li').click(function () {
+	            $('.rightmenu').hide();
+	        });
+	        
+	        //桌面点击右击 
+	        $('.layui-tab-title li').on('contextmenu', function (e) {
+	            var popupmenu = $(".rightmenu");
+	            var target = $(e.target);
+	            popupmenu.find("li").attr("lay-id",target.attr("lay-id"));
+	            leftPos = target.offset().left;
+	            topPos = target.offset().top + target.height();
+	            popupmenu.css({ left: leftPos, top: topPos }).show();
+	            //点击空白处，设置弹框消失。此处仍有问题，点击iframe无法进入方法。
+	            var flag = true;
+	            $(document).bind("click",function(e){
+	              if(target.closest(popupmenu).length == 0 && flag == true){
+	              	$('.rightmenu').hide();
+	              	flag = false;
+	              }
+	            });
+	            return false;
+	        });
         }
       
 		//选择关闭当前或关闭其它或关闭所有
@@ -235,8 +237,53 @@
 			$('.layui-footer').css('display', 'block')
             $("iframe").css("height",($(window).height()-149)+"px");
 		});
-	      
+		
     });
+    
+    function openPasswordPage(){
+		var content = '<div class="layui-form"><br>'
+					+ '<div class="layui-form-item"><label class="layui-form-label"><span style="color: red"> * </span>原始密码:</label>'
+					+ '<div class="layui-input-inline"> <input type="password" id="oldPass" class="layui-input" placeholder="请输入原始密码" autocomplete="off"></div></div>'
+					+ '<div class="layui-form-item"><label class="layui-form-label"><span style="color: red"> * </span>新密码:</label>'
+					+ '<div class="layui-input-inline"> <input type="password" id="newPass" class="layui-input" placeholder="请输入新密码" autocomplete="off"></div></div>'
+					+ '<div class="layui-form-item"><label class="layui-form-label"><span style="color: red"> * </span>确认新密码:</label>'
+					+ '<div class="layui-input-inline"> <input type="password" id="surePass" class="layui-input" placeholder="请确认新密码" autocomplete="off"></div></div>'
+					+ '<div class="layui-form-item" style="text-align:center"><button type="button" class="layui-btn" onclick="modifyPassword();">确认修改</button>'
+					+ '<button type="button" class="layui-btn layui-btn-primary" onclick="layer.closeAll();">取消</button></div></div>';
+			layer.open({
+				type : 1,
+				title : '修改密码',
+				shadeClose : false,
+				maxmin : false,
+				skin : 'layer-ext-moon',
+				shade : 0.2,
+				area : [ '350px', '280px' ],
+				content : content
+			}
+	}
+    
+    function modifyPassword(){
+    	//其他校验略，如：长度为8-16个字符,不能使用空格、中文,至少含数字/字母/字符2种组合,不能含有非法字符等
+    	if($('#oldPass').val().trim()==''){$('#oldPass').focus();layer.msg('请输入原始密码', {icon:5}); return}
+    	else if($('#newPass').val().trim()==''){$('#newPass').focus();layer.msg('请输入新密码', {icon:5}); return}
+    	else if($('#surePass').val().trim()==''){$('#surePass').focus();layer.msg('请确认新密码', {icon:5}); return}
+    	else if($('#newPass').val()!=$('#surePass').val()){$('#newPass').focus();layer.msg('两次输入的密码不一致，请重新输入', {icon:5}); return}
+    	var baseUrl = '[[${#httpServletRequest.getContextPath()}]]';
+    	$.ajax({
+            url: baseUrl + '/admin/modifyPassword',
+            type: "post",
+            dataType: "json",
+            data: {curPass:$('#oldPass').val(), newPass:$('#newPass').val(), surePass:$('#surePass').val()},
+            success: function (res) {
+            	res.code == 200
+            	  ?layer.alert("密码修改成功，请重新登录", function(){window.location=baseUrl + '/admin/logout'})
+            	  :layer.msg(res.message, {icon:5});
+            },
+    		error: function (res) {
+    			layer.msg('密码修改失败，请重试', {icon:5});
+            }
+     	})
+    }
 </script>
 </body>
 </html>

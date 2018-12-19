@@ -10,10 +10,11 @@ import com.github.pagehelper.PageInfo;
  */
 public class LayuiPageUtil {
 
+	@SuppressWarnings("rawtypes")
 	public static JSONObject getLayuiPage(PageInfo pageInfo) {
 		JSONObject obj = new JSONObject();
 		obj.put("code", 0);
-		obj.put("msg", "");
+		obj.put("msg", "请求异常！");
 		obj.put("count", pageInfo.getTotal());
 		obj.put("data", pageInfo.getList());
 		return obj;

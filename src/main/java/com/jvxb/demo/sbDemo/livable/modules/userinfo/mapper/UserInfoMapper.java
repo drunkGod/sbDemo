@@ -30,4 +30,7 @@ public interface UserInfoMapper extends BaseMapper{
 	@SelectProvider(type=UserInfoMapperProvider.class, method="getAll")
 	List<PageData> getAll(PageData pd);
 
+	@InsertProvider(type=UserInfoMapperProvider.class, method="insertBatch")
+	void insertBatch(@Param("listPd")List<PageData> listPd);
+
 }

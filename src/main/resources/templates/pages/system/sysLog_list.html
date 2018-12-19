@@ -19,13 +19,13 @@
 			<label class="layui-form-mid" style="margin-left: 30px;">操作时间：</label>
 			<div class="layui-inline">
 				 <input type="text"
-					style="float: left; width: 120px;" autocomplete="off"
-					id="createTimeStart" name="createTimeStart"
-					class="layui-input layDate" dateFormat="yyyy-MM-dd" /> <span
+					style="float: left; width: 160px;" autocomplete="off"
+					id="createTimeStart" name="createTimeStart" class="layui-input layDate" 
+					dateFormat="yyyy-MM-dd HH:mm:ss" dateType="datetime"/> <span
 					style="float: left; line-height: 38px; margin-left: 6px; margin-right: 6px;">至</span>
-				<input type="text" style="float: left; width: 120px;"
+				<input type="text" style="float: left; width: 160px;"
 					autocomplete="off" id="createTimeEnd" name="createTimeEnd"
-					class="layui-input layDate" dateFormat="yyyy-MM-dd" />
+					class="layui-input layDate" dateFormat="yyyy-MM-dd HH:mm:ss"  dateType="datetime" />
 			</div>
 			<button type="button" class="layui-btn" onclick="search()"><i class="layui-icon layui-icon-search"></i>查询</button>
 			<button type="button" class="layui-btn" onclick="$('#searchForm')[0].reset()"><i class="layui-icon layui-icon-refresh-1"></i>重置</button>

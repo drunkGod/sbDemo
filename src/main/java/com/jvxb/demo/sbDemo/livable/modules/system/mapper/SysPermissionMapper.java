@@ -44,7 +44,7 @@ public interface SysPermissionMapper extends BaseMapper{
 			+ " LEFT JOIN sys_permission spp ON sp.perm_pid = spp.perm_id " + " WHERE " + "	 sp.perm_id =  #{permId}")
 	PageData get(Integer permId);
 
-	@Select("select perm_id as permPid, perm_name as permPname from sys_permission where perm_pid is null order by sort")
+	@Select("select perm_id as permId, perm_name as permName from sys_permission where perm_pid is null order by sort")
 	List<PageData> getAvailable();
 
 }

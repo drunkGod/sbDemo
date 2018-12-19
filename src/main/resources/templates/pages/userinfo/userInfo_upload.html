@@ -8,7 +8,7 @@
 <script type="text/javascript" th:inline="javascript">
 	var basePath = [[${#httpServletRequest.getContextPath()}]];
     //保存
-    function save() {
+    function importUser() {
         if ($("#excel").val() == "" || document.getElementById("excel").files[0] == '请选择xls格式的文件') {
 
             $("#excel").tips({
@@ -20,22 +20,22 @@
             return false;
         }
 
-        $("#Form").ajaxSubmit({
-				url: basePath + "/user/uploadUser",
-				type:"post",
-				dataType:"json",
-				async:false,
-				success: function (data) {
+      	//提示加载
+    	parent.layer.load(1, {time: 3*1000});
+        $("#uploadForm").ajaxSubmit({
+			url: basePath + "/user/uploadUser",
+			type:"post",
+			dataType:"json",
+			async:false,
+			success: function (res) {
                 layer.closeAll("loading");
-                if (data.msg=="SUCCESS"){
-                    layer.msg("操作成功");
-                    window.setTimeout(function () {
-                    	parent.layer.closeAll();
-                    	//window.location.reload();
-                    }, 1200);
-                    
+                if (res.code==200){
+                	//成功后，1.关闭弹窗，2.刷新页面，3.提示保存成功。
+        			parent.layer.closeAll();
+        			reloadCurrentIFrame();
+        			parent.layer.msg('操作成功！', {icon: 6, time: 2*1000});
                 }else {
-                	console.log(data);
+                	layer.closeAll("loading");
                     layer.msg("系统错了小差，请稍后重试");
                 }
             },
@@ -63,9 +63,13 @@
     function closeWindow() {
         parent.layer.closeAll();
     }
+    
+    function downloadUser() {
+    	window.location.href = basePath + '/user/downUser';
+    }
 
 </script>
-<form name="Form" id="Form" method="post" enctype="multipart/form-data">
+<form name="uploadForm" id="uploadForm" method="post" enctype="multipart/form-data">
     <table style="width:95%; margin-top: 15px;">
     
         <tr height="38px;">
@@ -73,9 +77,9 @@
         </tr>
         <tr>
             <td style="text-align: center;">
-                <a class="btn btn-mini btn-primary" onclick="save();">导入</a>
-                <a class="btn btn-mini btn-danger" onclick="closeWindow();">取消</a>
-                <a class="btn btn-mini btn-success" onclick="">下载模版</a>
+                <a class="layui-btn layui-btn-warm" onclick="importUser();">导入</a>
+                <a class="layui-btn layui-btn-primary" onclick="closeWindow();">取消</a>
+                <a class="layui-btn layui-btn-normal" onclick="downloadUser()">下载模版</a>
             </td>
         </tr>
     </table>

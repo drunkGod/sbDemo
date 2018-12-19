@@ -83,7 +83,7 @@
 		layui.use('form', function(){
 		  //主要是渲染radio和select
 		  var form = layui.form;
-			//加载所有角色
+			//加载可用的父级权限
 			$.ajax({
 	            type: 'POST',
 	            url: ctxPath + '/admin/sysPerm/available',
@@ -93,9 +93,14 @@
 	                $("#permPnameSeletor").html("<option value=\"\" selected>根节点</option>");
 	                if(res.code == 200) {
 	                	for (var i in res.data) {
-	                        var item = res.data[i];
+	                        var parent = res.data[i];
 	                        var str = null;
-	                        str = '<option ' + (item.permPid == permPid ? 'selected' : '') + ' value="' + item.permPid + '">' + item.permPname + '</option>';
+	                        if(parent.permId == permPid) {
+		                        str = '<option selected value="' + parent.permId + '">' + parent.permName + '</option>';
+		                        $('#permPid').val(parent.permId);
+	                        } else {
+		                        str = '<option value="' + parent.permId + '">' + parent.permName + '</option>';
+	                        }
 	                        $('#permPnameSeletor').append(str);
 	                        //重新渲染
 	                        form.render();

@@ -117,22 +117,7 @@
             success: function (res) {
                 if (res.code == 200) {
                     var treeDataList = res.data;
-                    var treeData = [];
-                    for (var i = 0; i < treeDataList.length; i++) {
-                        var treeObj = {};
-                        treeObj.name = treeDataList[i].permName;
-                        treeObj.id = treeDataList[i].permId;
-                        treeObj.pid = treeDataList[i].permPid;
-                        if (treeDataList[i].children != null) {
-                            treeObj.children = getChildren(treeDataList[i].children);
-                        }
-                        treeData.push(treeObj);
-                    }
-                    if (zNodes == null) {
-                        zNodes = [
-                            {name: "根节点", open: true, id: null, children: treeData}
-                        ];
-                    }
+                    zNodes = [{name: "根节点", open: true, id: null, children: treeDataList}];
                     zTreeObj = $.fn.zTree.init($("#rolePermTree"), setting, zNodes);
                     //勾选当前角色的权限
                     if(rolePerm != null){
@@ -140,7 +125,7 @@
                     	for(var i = 0; i < permIds.length; i++){
                     		var tmpNode = zTreeObj.getNodeByParam("id", permIds[i], null);
                     		//父节点不用勾选，子节点勾选后会自动勾选父节点
-                    		if(tmpNode != null && tmpNode.children == null){
+                    		if(tmpNode != null && tmpNode.children.length == 0){
                     			zTreeObj.checkNode(tmpNode, true, true);
                     		}
                     		
@@ -150,19 +135,6 @@
             }
         })
     }
-
-    function getChildren(treeData) {
-        var sonArr = [];
-        for (var i = 0; i < treeData.length; i++) {
-            var treeObj = {};
-            treeObj.name = treeData[i].permName;
-            treeObj.id = treeData[i].permId;
-            treeObj.pid = treeData[i].permPid;
-            sonArr.push(treeObj);
-        }
-        return sonArr;
-    }
-    
 
     function zTreeOnClick(event, treeId, treeNode) {
     	//如果点击根节点.则展开/收起所有一级节点。

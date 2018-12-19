@@ -59,4 +59,9 @@ public class UserInfoServiceImpl implements IUserInfoService {
 		
 	}
 
+	@Override
+	public void insertBatch(List<PageData> listPd) {
+		userInfoMapper.insertBatch(listPd);
+	}
+
 }

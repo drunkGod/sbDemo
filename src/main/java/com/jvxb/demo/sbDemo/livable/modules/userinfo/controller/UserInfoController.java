@@ -1,14 +1,20 @@
 package com.jvxb.demo.sbDemo.livable.modules.userinfo.controller;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jvxb.demo.sbDemo.livable.configuration.annotation.LogAnnotation;
@@ -16,7 +22,10 @@ import com.jvxb.demo.sbDemo.livable.modules.base.controller.BaseController;
 import com.jvxb.demo.sbDemo.livable.modules.userinfo.service.IUserInfoService;
 import com.jvxb.demo.sbDemo.livable.utils.CommonUtil;
 import com.jvxb.demo.sbDemo.livable.utils.DateUtil;
+import com.jvxb.demo.sbDemo.livable.utils.FileUtil;
+import com.jvxb.demo.sbDemo.livable.utils.ObjectExcelRead;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
+import com.jvxb.demo.sbDemo.livable.utils.UploadUtil;
 import com.jvxb.demo.sbDemo.livable.utils.response.ResponseMessage;
 
 /**
@@ -29,6 +38,8 @@ public class UserInfoController extends BaseController {
 
 	@Autowired
 	IUserInfoService userInfoService;
+	@Autowired
+	UploadUtil uploadUtil;
 
 	/**
 	 * 前往列表页
@@ -150,41 +161,56 @@ public class UserInfoController extends BaseController {
 	}
 
 	/**
+	 * 打开excel导入用户界面
+	 */
 	@RequestMapping("/user/uploadUserPage")
 	public Object uploadUser() {
-		return "user/user_upload";
+		return "userinfo/userInfo_upload";
 	}
 
+	/**
+	 * 通过excel导入用户
+	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping("/user/uploadUser")
 	@ResponseBody
 	@LogAnnotation(operate = "根据模板批量添加用户")
 	public Object uploadUser(@RequestParam("excel") MultipartFile file, HttpServletRequest request) {
-		ModelMap resultMap = new ModelMap();
+		String excelPath = null;
 		if (file != null && !file.isEmpty()) {
-			String msg = "SUCCESS";
-			String fileName = file.getOriginalFilename();
-			String filePath = uploadPath + "excel" + File.separator;
 			try {
-				CommonFileUtil.uploadFile(file.getBytes(), filePath, fileName);
-				// 根据上传的excel解析出用户信息，并添加至数据库，此处略。
+				//上传excel，并返回excel最终路径
+				excelPath = uploadUtil.uploadExcel(file);
+				//根据excel路径读取excel: 读EXCEL操作,读出的数据导入List 2:从第3行开始；0:从第A列开始；0:第0个sheet
+				@SuppressWarnings("rawtypes")
+				List<PageData> listPd = (List)ObjectExcelRead.readExcel(excelPath, 2, 0, 0);
+				if (listPd != null && listPd.size() > 0) {
+					listPd.forEach((e)-> System.out.println(e.toString()));
+					userInfoService.insertBatch(listPd);
+				}
+				
 			} catch (Exception e) {
-				msg = e.getMessage();
+				return ResponseMessage.error("批量添加失败！");
 			}
-			resultMap.put("msg", msg);
 		}
-		return resultMap;
+		return ResponseMessage.ok();
 	}
 
+	/**
+	 * 下载用户excel模板
+	 */
 	@RequestMapping("/user/downUser")
 	@LogAnnotation(operate = "下载用户模板")
 	public void downUser(HttpServletResponse response) {
+		//目标模板文件的位置
+		String targetPosition = uploadUtil.getUploadPath() + "excel" + File.separator + "_template" + File.separator + "userTemplate.xls";
+		//下载后显示的名字
+		String downLownName = "user.xls";
 		try {
-			CommonFileUtil.fileDownload(response, uploadPath + "excel" + File.separator + "userTemplate.xls",
-					"user.xls");
+			FileUtil.fileDownload(response, targetPosition, downLownName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	 */
 
 }

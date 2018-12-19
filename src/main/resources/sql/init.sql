@@ -138,6 +138,7 @@ INSERT INTO `sys_role_perm` VALUES ('1', '1', '1', '2018-11-14 14:14:00');
 INSERT INTO `sys_role_perm` VALUES ('2', '1', '2', '2018-11-14 14:14:00');
 INSERT INTO `sys_role_perm` VALUES ('3', '1', '3', '2018-11-14 14:14:00');
 INSERT INTO `sys_role_perm` VALUES ('4', '1', '4', '2018-11-14 14:14:00');
+INSERT INTO `sys_role_perm` VALUES ('5', '1', '5', '2018-11-14 14:14:00');
 INSERT INTO `sys_role_perm` VALUES ('6', '1', '6', '2018-11-14 14:14:00');
 INSERT INTO `sys_role_perm` VALUES ('7', '1', '7', '2018-11-14 14:14:00');
 INSERT INTO `sys_role_perm` VALUES ('8', '1', '8', '2018-11-14 14:14:00');

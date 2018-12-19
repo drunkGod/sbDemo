@@ -105,24 +105,21 @@
 	function add(){
 		var title = "新增";
 		var permPid = currentTree == null? '' : currentTree.id;
-		var permPname = currentTree == null? '' : currentTree.name;
-		var openurl = ctxPath + "/admin/sysPermission/form?mode=add&permPid=" + permPid+"&permPname="+permPname;
+		var openurl = ctxPath + "/admin/sysPermission/form?mode=add&permPid=" + permPid;
 		commonOpen(title, openurl, "700px", "490px"); 
 	}
 	
 	function view(permId) {
 		var title = "查看";
 		var permPid = currentTree == null? '' : currentTree.id;
-		var permPname = currentTree == null? '' : currentTree.name;
-		var openurl = ctxPath + "/admin/sysPermission/form?mode=view&permId="+permId+"&permPid=" + permPid +"&permPname="+permPname;
+		var openurl = ctxPath + "/admin/sysPermission/form?mode=view&permId="+permId+"&permPid=" + permPid;
 		commonOpen(title, openurl, "700px", "490px");
 	}
 	
 	function edit(permId) {
 		var title = "编辑";
 		var permPid = currentTree == null? '' : currentTree.id;
-		var permPname = currentTree == null? '' : currentTree.name;
-		var openurl = ctxPath + "/admin/sysPermission/form?mode=edit&permId="+permId+"&permPid=" + permPid +"&permPname="+permPname;
+		var openurl = ctxPath + "/admin/sysPermission/form?mode=edit&permId="+permId+"&permPid=" + permPid;
 		commonOpen(title, openurl, "700px", "490px");
 	}
 	
@@ -185,63 +182,25 @@
             success: function (res) {
                 if (res.code == 200) {
                 	var treeDataList = res.data;
-                    var treeData = [];
-                    for (var i = 0; i < treeDataList.length; i++) {
-                        var treeObj = {};
-                        treeObj.name = treeDataList[i].name;
-                        treeObj.id = treeDataList[i].id;
-                        treeObj.pid = treeDataList[i].parentId;
-                        if (treeDataList[i].children != null) {
-                            treeObj.children = getChildren(treeDataList[i].children);
-                        }
-                        treeData.push(treeObj);
-                    }
-                    if (zNodes == null) {
-                        zNodes = [
-                            {name: "根节点", open: true, id: null, children: treeData}
-                        ];
-                    }
+                    zNodes = [{name: "根节点", open: true, id: null, children: treeDataList}];
                     zTreeObj = $.fn.zTree.init($("#permTree"), setting, zNodes);
                 }
             }
         })
     }
 
-    function getChildren(treeData) {
-        var sonArr = [];
-        for (var i = 0; i < treeData.length; i++) {
-            var treeObj = {};
-            treeObj.name = treeData[i].permName;
-            treeObj.id = treeData[i].permId;
-            treeObj.pid = treeData[i].permPid;
-            sonArr.push(treeObj);
-        }
-        return sonArr;
-    }
-    
-    var reloadTable;
-    layui.use(['table'], function () {//layui 模块引用，根据需要自行修改
-        var table = layui.table;
-        //表刷新方法
-        reloadTable = function (item) {
-            $('#id').val(item.id);
-            $('#parentId').val(item.parentId);
-            table.reload("sysPermissionTable", { //此处是上文提到的 初始化标识id
-                page: {
-                    curr: 1 //重新从第 1 页开始
-                }
-                , where: {
-                    id: item.id, parentId: item.pid, reload: 'reloadTable'
-                }
-            });
-        };
-    })
-
     function zTreeOnClick(event, treeId, treeNode) {
         //点击节点，则重载表格。
         currentTree = treeNode;
-        reloadTable(treeNode);
-    };
+        layui.table.reload('sysPermissionTable', {
+			where : {
+				pageSize : 10,
+				currentPage : 1,
+				id: treeNode.id, 
+				parentId: treeNode.pid
+			}
+		});
+    }
 
     $(document).ready(function () {
         initTree();

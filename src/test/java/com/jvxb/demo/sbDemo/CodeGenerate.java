@@ -60,52 +60,52 @@ public class CodeGenerate {
 		String controllerFileCompleteName = fileDir + (SAME_PACKAGE ? "" : ("controller" + File.separator))
 				+ controllerClassName;
 		System.err.println("--->开始生成代码：" + controllerFileCompleteName);
-		CommonFileUtil.writeFile(controllerFileCompleteName, getControllerContent());
+		FileUtil.writeFile(controllerFileCompleteName, getControllerContent());
 
 		// 根据路径全名生成 XxxService.java
 		String serviceClassName = "I" + ENTITY_NAME + "Service.java";
 		String serviceFileCompleteName = fileDir + (SAME_PACKAGE ? "" : ("service" + File.separator))
 				+ serviceClassName;
 		System.err.println("--->开始生成代码：" + serviceFileCompleteName);
-		CommonFileUtil.writeFile(serviceFileCompleteName, getServiceContent());
+		FileUtil.writeFile(serviceFileCompleteName, getServiceContent());
 
 		// 根据路径全名生成 XxxServiceImpl.java
 		String implClassName = ENTITY_NAME + "ServiceImpl.java";
 		String serviceImplFileCompleteName = fileDir
 				+ (SAME_PACKAGE ? "" : ("service" + File.separator + "impl" + File.separator)) + implClassName;
 		System.err.println("--->开始生成代码：" + serviceImplFileCompleteName);
-		CommonFileUtil.writeFile(serviceImplFileCompleteName, getServiceImplContent());
+		FileUtil.writeFile(serviceImplFileCompleteName, getServiceImplContent());
 
 		// 根据路径全名生成 XxxMapper.java
 		String mapperClassName = ENTITY_NAME + "Mapper.java";
 		String mapperFileCompleteName = fileDir + (SAME_PACKAGE ? "" : ("mapper" + File.separator)) + mapperClassName;
 		System.err.println("--->开始生成代码：" + mapperFileCompleteName);
-		CommonFileUtil.writeFile(mapperFileCompleteName, getMapperContent());
+		FileUtil.writeFile(mapperFileCompleteName, getMapperContent());
 
 		// 根据路径全名生成 XxxMapperProvider.java
 		String mapperProClassName = ENTITY_NAME + "MapperProvider.java";
 		String mapperProFileCompleteName = fileDir + (SAME_PACKAGE ? "" : ("mapper" + File.separator))
 				+ mapperProClassName;
 		System.err.println("--->开始生成代码：" + mapperProFileCompleteName);
-		CommonFileUtil.writeFile(mapperProFileCompleteName, getMapperProviderContent(tableInfoList));
+		FileUtil.writeFile(mapperProFileCompleteName, getMapperProviderContent(tableInfoList));
 
 		// 根据路径全名生成 xxx_form.html
 		String listHtmlName = ENTITY_NAME.substring(0, 1).toLowerCase() + ENTITY_NAME.substring(1) + "_list.html";
 		String listHtmlCompleteName = fileDir + MODULE_NAME + File.separator + listHtmlName;
 		System.err.println("--->开始生成代码：" + listHtmlCompleteName);
-		CommonFileUtil.writeFile(listHtmlCompleteName, getListHtmlContent(tableInfoList));
+		FileUtil.writeFile(listHtmlCompleteName, getListHtmlContent(tableInfoList));
 
 		// 根据路径全名生成 xxx_form.html
 		String formHtmlName = ENTITY_NAME.substring(0, 1).toLowerCase() + ENTITY_NAME.substring(1) + "_form.html";
 		String formHtmlCompleteName = fileDir + MODULE_NAME + File.separator + formHtmlName;
 		System.err.println("--->开始生成代码：" + formHtmlCompleteName);
-		CommonFileUtil.writeFile(formHtmlCompleteName, getFormHtmlContent(tableInfoList));
+		FileUtil.writeFile(formHtmlCompleteName, getFormHtmlContent(tableInfoList));
 
 		System.err.println("==========================================");
 		System.err.println("================生成完毕==================");
 		System.err.println("==========================================");
 		// 生成后打开目标文件夹
-		CommonFileUtil.openDir(TARGET_DIR);
+		FileUtil.openDir(TARGET_DIR);
 	
 	}
 	
@@ -392,9 +392,9 @@ public class CodeGenerate {
 				+ "		var columnName = $('#columnName').val();\r\n"
 				+ "		layui.table.reload('" + entityNameLower + "Table',{\r\n" 
 				+ "			where : {\r\n"
-				+ "			pageSize : 10,\r\n" 
-				+ "			currentPage : 1,\r\n"
-				+ "			columnName : columnName\r\n" 
+				+ "			    pageSize : 10,\r\n" 
+				+ "			    currentPage : 1,\r\n"
+				+ "			    columnName : columnName\r\n" 
 				+ "			}\r\n" 
 				+ "		})\r\n" 
 				+ "	}\r\n"
@@ -406,11 +406,11 @@ public class CodeGenerate {
 
 	// 生成基本的controller,service,mapper包
 	private static void generateBasePackage(String fileDir) throws Exception {
-		CommonFileUtil.genDir(fileDir);
-		CommonFileUtil.genDir(fileDir + "controller");
-		CommonFileUtil.genDirs(fileDir + "service" + File.separator + "impl");
-		CommonFileUtil.genDir(fileDir + "mapper");
-		CommonFileUtil.genDir(fileDir + MODULE_NAME);
+		FileUtil.genDir(fileDir);
+		FileUtil.genDir(fileDir + "controller");
+		FileUtil.genDirs(fileDir + "service" + File.separator + "impl");
+		FileUtil.genDir(fileDir + "mapper");
+		FileUtil.genDir(fileDir + MODULE_NAME);
 	}
 
 	/**

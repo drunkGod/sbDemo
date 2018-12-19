@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 
 import com.jvxb.demo.sbDemo.base.entity.system.SysUser;
@@ -35,5 +36,8 @@ public interface SysUserMapper extends BaseMapper{
 
 	@UpdateProvider(type = SysUserMapperProvider.class, method = "updateAll")
 	void updateAll(PageData pd);
+
+	@Update("update sys_user set password = #{newPass} where id = #{id}")
+	void updatePassword(@Param("id") Integer id, @Param("newPass") String newPass);
 
 }

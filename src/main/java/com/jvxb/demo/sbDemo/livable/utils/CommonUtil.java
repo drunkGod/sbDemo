@@ -61,6 +61,7 @@ public class CommonUtil {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	public static boolean isNullOrEmpty(Object obj) {
 		// 对象是否为null
 		if (obj == null) {
