@@ -57,7 +57,8 @@
 					, { field : 'phone', width : 130, title : '手机号码' }
 					, { field : 'idcard', width : 180, title : '身份证号' }
 					, { field : 'age', width : 70, title : '年龄', align:'center'}
-					, { field : 'create_time', width:180, title: '创建时间', templet: "<div>{{layui.util.toDateString(d.create_time, 'yyyy-MM-dd HH:mm:ss')}}</div>"}
+					, { field : 'create_time', width:180, title: '创建时间', templet: 
+						function(d){ return d.create_time ? layui.util.toDateString(d.create_time, 'yyyy-MM-dd HH:mm:ss') : ""}}
 					, { fixed : 'right', width : 200, title : '操作', align : 'center', toolbar : '#operationBar' }
 					] ],
 				page : true //是否显示分页
@@ -158,11 +159,8 @@
 	}
 	
 	function uploadUser(){
-		parent.layer.msg('略');
-	}
-	
-	function printPage(){
-		parent.layer.msg('略');
+		var openUrl = ctxPath + "/user/uploadUserPage";
+		commonOpen("上传用户", openUrl, "300px", "150px");
 	}
 	</script>
 	

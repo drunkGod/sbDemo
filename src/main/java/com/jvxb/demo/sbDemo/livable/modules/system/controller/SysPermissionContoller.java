@@ -61,7 +61,6 @@ public class SysPermissionContoller extends BaseController {
 		model.addAttribute("mode", pd.get("mode"));
 		model.addAttribute("permId", pd.get("permId"));
 		model.addAttribute("permPid", pd.get("permPid"));
-		model.addAttribute("permPname", CommonUtil.isNullOrEmpty(pd.get("permPname")) ? "根节点" : pd.get("permPname"));
 		return "system/sysPermission_form";
 	}
 
@@ -142,7 +141,7 @@ public class SysPermissionContoller extends BaseController {
 	}
 
 	/**
-	 * 新增权限时，获取可用的父权限
+	 * 新增/编辑权限时，获取可用的父权限
 	 */
 	@RequestMapping("/admin/sysPerm/available")
 	@ResponseBody

@@ -79,25 +79,81 @@ public class SysRoleContoller extends BaseController {
 		}
 		sysRoleService.insertOrUpdate(pd);
 		if (CommonUtil.notNullOrEmpty(pd.get("roleId"))) {
+			// 获取角色在数据库中的权限
+			String dbPerms = sysRolePermService.getRolePermByRoleId(pd.getInteger("roleId"));
 			// 判断角色权限与当前权限是否一致。一致则不需操作
-			if (permIsChange(pd.getInteger("roleId"), pd.getString("rolePerm"))) {
-				// 修改权限时，先将库中角色对应的权限删除
-				sysRolePermService.deleteRolePermByRoleId(pd.getInteger("roleId"));
-				//如果当前权限不为空，再插入当前权限。
-				if (CommonUtil.notNullOrEmpty(pd.get("rolePerm"))) {
-					sysRolePermService.insertOrUpdate(pd.getInteger("roleId"), pd.getString("rolePerm"));
+			if (isPermChange(dbPerms, pd.getString("rolePerm"))) {
+				if(isPermOnlyAdd(dbPerms, pd.getString("rolePerm"))) {
+					sysRolePermService.insertOrUpdate(pd.getInteger("roleId"), getNewPerms(dbPerms, pd.getString("rolePerm")));
+				} else {
+					//修改权限时，先将库中角色对应的权限删除
+					sysRolePermService.deleteRolePermByRoleId(pd.getInteger("roleId"));
+					//如果当前权限不为空，再插入当前权限。
+					if (CommonUtil.notNullOrEmpty(pd.get("rolePerm"))) {
+						sysRolePermService.insertOrUpdate(pd.getInteger("roleId"), pd.getString("rolePerm"));
+					}
 				}
+				
 			}
 		}
 		return ResponseMessage.ok();
 	}
 
 	/**
+	 * 判断角色权限是否需要仅为新增
+	 */
+	private boolean isPermOnlyAdd(String dbPerms, String curPerms) {
+		//如果数据库中权限为空，当前也为空，则不是新增权限，可能需要删除
+		if(CommonUtil.isNullOrEmpty(dbPerms) && CommonUtil.isNullOrEmpty(curPerms)) {
+			return false;
+		}
+		//如果数据库中权限为空，当前不为空，则仅是新增权限
+		if(CommonUtil.isNullOrEmpty(dbPerms) && CommonUtil.notNullOrEmpty(curPerms)) {
+			return true;
+		}
+		//如果数据库中权限不为空，当前为空，则仅是新增权限
+		if(CommonUtil.notNullOrEmpty(dbPerms) && CommonUtil.isNullOrEmpty(curPerms)) {
+			return false;
+		}
+		String[] dbPermsArr = dbPerms.split(",");
+		String[] curPermsArr = curPerms.split(",");
+		List<String> curPermList = Arrays.asList(curPermsArr);
+		//如果当前权限包含所有数据库中的权限，则仅是新增权限。
+		for (String dbPerm : dbPermsArr) {
+			// 如果没有这个元素，则不仅仅只是新增，而伴随着修改
+			if (!curPermList.contains(dbPerm)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * 获取角色新增的权限
+	 */
+	private String getNewPerms(String dbPerms, String curPerms) {
+		String newPerms = "";
+		//如果数据库中权限为空，当前有权限，则仅是新增权限
+		if(CommonUtil.isNullOrEmpty(dbPerms) && CommonUtil.notNullOrEmpty(curPerms)) {
+			return curPerms;
+		}
+		String[] dbPermsArr = dbPerms.split(",");
+		String[] curPermsArr = curPerms.split(",");
+		List<String> dbPermList = Arrays.asList(dbPermsArr);
+		for (String curPerm : curPermsArr) {
+			// 如果数据库没有这个元素，则是新增
+			if (!dbPermList.contains(curPerm)) {
+				newPerms += curPerm+",";
+			}
+		}
+		
+		return CommonUtil.trimLastDot(newPerms);
+	}
+
+	/**
 	 * 判断角色权限是否需要修改
 	 */
-	private boolean permIsChange(Integer roleId, String curPerms) {
-		// 获取角色在数据库中的权限
-		String dbPerms = sysRolePermService.getRolePermByRoleId(roleId);
+	private boolean isPermChange(String dbPerms, String curPerms) {
 
 		// 数据库中无记录，当前权限也无记录。不需改变
 		if (dbPerms == null && (curPerms == null || curPerms.equals(""))) {
@@ -115,22 +171,11 @@ public class SysRoleContoller extends BaseController {
 		if (dbPerms.length() != curPerms.length()) {
 			return true;
 		}
-
-		// 数据库中有记录，当前权限也有记录。且当前权限与数据库权限一直，权限不需要改变
+		// 数据库中有记录，当前权限也有记录。且当前权限与数据库权限一致，权限不需要改变
 		if (dbPerms.equals(curPerms)) {
 			return false;
 		}
 
-		// 数据库中有记录，当前权限也有记录。如果权限长度相等，判断具体权限是否相等
-		String[] dbPermsArr = dbPerms.split(",");
-		String[] curPermsArr = curPerms.split(",");
-		List<String> list = Arrays.asList(dbPermsArr);
-		for (String curPerm : curPermsArr) {
-			// 如果没有这个元素，则权限也已改变。
-			if (!list.contains(curPerm)) {
-				return true;
-			}
-		}
 		return false;
 	}
 

@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author 抓娃小兵
  */
-public class CommonFileUtil {
+public class FileUtil {
 
-	static Random random = new Random();
+	private static Random random = new Random();
 	/**
 	 * @Description : 上传文件
 	 * @param file     : 上传的文件实体
@@ -53,7 +53,7 @@ public class CommonFileUtil {
 	public static void fileDownload(final HttpServletResponse response, String filePath, String fileName)
 			throws Exception {
 
-		byte[] data = CommonFileUtil.toByteArray2(filePath);
+		byte[] data = FileUtil.toByteArray2(filePath);
 		fileName = URLEncoder.encode(fileName, "UTF-8");
 		response.reset();
 		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
@@ -130,14 +130,14 @@ public class CommonFileUtil {
 	}
 	
 	/**
-	 * 格式化图片名称, 避免文件名重复
+	 * 格式化文件名称, 避免文件名重复
 	 */
-	public static String formatImgName(String imgName) {
-		String prefix = imgName.getBytes().toString().substring(3);
+	public static String formatFileName(String fileName) {
+		String prefix = fileName.getBytes().toString().substring(3);
 		String midfix = new Date().getTime() + "";
 		String random1 = random.nextInt(10) + "";
 		String random2 = random.nextInt(10) + "";
-		String suffix = imgName.replaceAll(".+(\\.\\w+)", "$1");
+		String suffix = fileName.replaceAll(".+(\\.\\w+)", "$1");
 		String realName = prefix + midfix + random1 + random2 + suffix;
 		return realName;
 	}
@@ -246,13 +246,6 @@ public class CommonFileUtil {
 			} catch (Exception e) {
 			}
 		}
-	}
-
-	/**
-	 * 获取前台所需的src, upload将会映射到WebMvcConfig中配置的目标文件夹，也就是uploadSetting.properties中配置的路径
-	 */
-	public static String getResourceSrc(String type, String nowDate, String fileName) {
-		return File.separator + "uploadResource" + File.separator + type + File.separator + nowDate + File.separator + fileName;
 	}
 
 }

@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jvxb.demo.sbDemo.livable.configuration.sysConf.UploadPathConfig;
-import com.jvxb.demo.sbDemo.livable.utils.CommonFileUtil;
-import com.jvxb.demo.sbDemo.livable.utils.DateUtil;
+import com.jvxb.demo.sbDemo.livable.utils.UploadUtil;
 import com.jvxb.demo.sbDemo.livable.utils.response.ResponseMessage;
 
 /**
@@ -25,58 +23,29 @@ import com.jvxb.demo.sbDemo.livable.utils.response.ResponseMessage;
 public class UploadController {
 	
 	@Autowired
-	UploadPathConfig uploadPathConfig;
+	UploadUtil uploadUtil;
 
 	// 处理文件上传
 	@RequestMapping(value = "/uploadImg", method = RequestMethod.POST)
 	@ResponseBody
 	public Object uploadImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-		String imgSrc = null;
-		String uploadType = "img";
+		String imgPath = null;
 		if (file != null && !file.isEmpty()) {
-			// 设置文件名称
-			String fileName = file.getOriginalFilename();
-			fileName = CommonFileUtil.formatImgName(fileName);
-			// 设置实际上传路径: 基本路径/类型/日期/
-			String basePath = uploadPathConfig.getUploadPathConfig();
-			String nowDate = DateUtil.getDays();
-			String realPath = CommonFileUtil.formatUploadPath(basePath, uploadType, nowDate);
-			try {
-				//开始上传
-				CommonFileUtil.uploadFile(file.getBytes(), realPath, fileName);
-				// 上传成功后，返回前台展示需要的图片地址
-				imgSrc = CommonFileUtil.getResourceSrc(uploadType, nowDate, fileName);
-			} catch (Exception e) {
-				return ResponseMessage.error(e.getMessage());
-			}
+			imgPath = uploadUtil.uploadImg(file);
 		}
-		return ResponseMessage.ok(imgSrc);
+		return ResponseMessage.ok(imgPath);
 	}
 
 	// 处理文件上传
 	@RequestMapping(value = "/uploadExcel", method = RequestMethod.POST)
 	@ResponseBody
 	public Object uploadExcel(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-		String excelSrc = null;
-		String uploadType = "excel";
+		String excelPath = null;
 		if (file != null && !file.isEmpty()) {
-			// 设置文件名称
-			String fileName = file.getOriginalFilename();
-			fileName = CommonFileUtil.formatImgName(fileName);
-			// 设置实际上传路径: 基本路径/类型/日期/
-			String basePath = uploadPathConfig.getUploadPathConfig();
-			String nowDate = DateUtil.getDays();
-			String realPath = CommonFileUtil.formatUploadPath(basePath, uploadType, nowDate);
-			try {
-				//开始上传
-				CommonFileUtil.uploadFile(file.getBytes(), realPath, fileName);
-				// 上传成功后，返回前台展示需要的图片地址
-				excelSrc = CommonFileUtil.getResourceSrc(uploadType, nowDate, fileName);
-			} catch (Exception e) {
-				return ResponseMessage.error(e.getMessage());
-			}
+			excelPath = uploadUtil.uploadExcel(file);
 		}
-		return ResponseMessage.ok(excelSrc);
+		return ResponseMessage.ok(excelPath);
 	}
-
+	
+	
 }

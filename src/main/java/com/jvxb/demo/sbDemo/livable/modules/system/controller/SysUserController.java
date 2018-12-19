@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jvxb.demo.sbDemo.base.entity.system.SysUser;
 import com.jvxb.demo.sbDemo.livable.configuration.annotation.LogAnnotation;
 import com.jvxb.demo.sbDemo.livable.modules.base.controller.BaseController;
 import com.jvxb.demo.sbDemo.livable.modules.system.service.ISysUserService;
@@ -72,7 +73,22 @@ public class SysUserController extends BaseController {
 		sysUserService.insertOrUpdate(pd);
 		return ResponseMessage.ok();
 	}
-
+	
+	/**
+	 * 修改密码
+	 */
+	@RequestMapping("/admin/modifyPassword")
+	@ResponseBody
+	public Object modifyPassword(String curPass, String newPass, String surePass) {
+		SysUser user = getSessionUser();
+		if(curPass != null && user.getPassword().equals(curPass)) {
+			sysUserService.updatePassword(user.getId(), newPass);
+		} else {
+			return ResponseMessage.error("原始密码不正确，请重新输入！");
+		}
+		return ResponseMessage.ok();
+	}
+	
 	/**
 	 * 删除用户
 	 */

@@ -67,6 +67,11 @@ public abstract class BaseController {
 		return request.getContextPath();
 	}
 	
+	/**
+	 * 慎用！！ 可能引起sql注入！
+	 * @param sql
+	 * @return
+	 */
 	public List<PageData> excuteSql(String sql){
 		List<PageData> result = baseMapper.excuteSql(sql);
 		return result;

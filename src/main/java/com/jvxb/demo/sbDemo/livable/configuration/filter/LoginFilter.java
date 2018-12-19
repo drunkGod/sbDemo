@@ -47,8 +47,8 @@ public class LoginFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		// 某些特定接口不过滤: /get/类型的接口
-		if (uri.matches(".+/get/.+")) {
+		// 某些特定接口不过滤: 系统Api提供数据的接口
+		if (uri.startsWith("/admin/demo/api")) {
 			filterChain.doFilter(request, response);
 			return;
 		}

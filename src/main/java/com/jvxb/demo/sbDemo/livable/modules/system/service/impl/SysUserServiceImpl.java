@@ -62,4 +62,9 @@ public class SysUserServiceImpl implements ISysUserService {
 		sysUserMapper.updateAll(pd);
 	}
 
+	@Override
+	public void updatePassword(Integer id, String newPass) {
+		sysUserMapper.updatePassword(id, newPass);
+	}
+
 }

@@ -34,10 +34,10 @@ public class BaseErrorController implements ErrorController {
 	 * @return
 	 */
 	@RequestMapping(value = "/error", produces = "text/html")
-	public Object handleErrorHtml(ModelMap map, HttpServletRequest request) {
-		map.put("statusCode", request.getAttribute("javax.servlet.error.status_code"));
-		map.put("url", request.getAttribute("javax.servlet.error.request_uri"));
-		map.put("ex", request.getAttribute("javax.servlet.error.exception"));
+	public Object handleErrorHtml(ModelMap modelMap, HttpServletRequest request) {
+		modelMap.put("statusCode", request.getAttribute("javax.servlet.error.status_code"));
+		modelMap.put("url", request.getAttribute("javax.servlet.error.request_uri"));
+		modelMap.put("ex", request.getAttribute("javax.servlet.error.exception"));
 		return getErrorPath();
 	}
 
@@ -53,6 +53,7 @@ public class BaseErrorController implements ErrorController {
 		resultMap.put("statusCode", request.getAttribute("javax.servlet.error.status_code"));
 		resultMap.put("url", request.getAttribute("javax.servlet.error.request_uri"));
 		resultMap.put("ex", request.getAttribute("javax.servlet.error.exception"));
+		resultMap.put("message", "请求异常！");
 		return resultMap;
 	}
 }

@@ -9,6 +9,7 @@ import java.util.Objects;
  * 
  * @author 抓娃小兵
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class TreeEntity<T extends TreeEntity> {
 
 	private Integer id;

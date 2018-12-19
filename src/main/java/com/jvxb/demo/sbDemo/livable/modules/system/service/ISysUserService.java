@@ -10,4 +10,9 @@ public interface ISysUserService extends IBaseService {
 	 */
 	SysUser checkExist(String username, String password);
 
+	/**
+	 * 修改密码
+	 */
+	void updatePassword(Integer id, String newPass);
+
 }

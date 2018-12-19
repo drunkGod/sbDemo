@@ -17,7 +17,7 @@ public class UploadPathConfig {
 	/**
 	 * 根据当前系统，返回uploadSetting.properties中配置的上传路径
 	 */
-	public String getUploadPathConfig() {
+	public String getUploadPath() {
 		if(System.getProperty("os.name").toLowerCase().indexOf("linux") >= 0){
 			return linuxPath;
         }else if(System.getProperty("os.name").toLowerCase().indexOf("windows") >= 0){
