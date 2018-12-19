@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.jvxb.demo.sbDemo.livable.utils.CommonFileUtil;
+import com.jvxb.demo.sbDemo.livable.utils.FileUtil;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -542,11 +542,11 @@ public class CodeGenerate {
 				+ "import org.apache.ibatis.annotations.UpdateProvider;\r\n"
 				+ "import org.apache.ibatis.annotations.SelectProvider;\r\n" 
 				+ "\r\n"
-				+ "import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;\r\n" 
+				+ "import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;\r\n" 
 				+ "import com.jvxb.demo.sbDemo.livable.utils.PageData;\r\n" 
 				+ "\r\n" 
 				+ "@Mapper\r\n"
-				+ "public interface " + ENTITY_NAME + "Mapper extends BaseMapper {\r\n" 
+				+ "public interface " + ENTITY_NAME + "Mapper extends SqlMapper {\r\n" 
 				+ "\r\n" 
 				+ "	@SelectProvider(type=" + ENTITY_NAME + "MapperProvider.class, method=\"getTablePageData\")\r\n"
 				+ "	List<PageData> getTablePageData(@Param(\"columnName\") String columnName);\r\n" 

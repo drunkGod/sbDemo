@@ -1,7 +1,5 @@
 package com.jvxb.demo.sbDemo.livable.modules.base.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +8,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.jvxb.demo.sbDemo.base.entity.system.SysUser;
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 /**
@@ -20,9 +18,6 @@ import com.jvxb.demo.sbDemo.livable.utils.PageData;
  */
 public abstract class BaseController {
 	
-	@Autowired
-	BaseMapper baseMapper;
-
 	/**
 	 * 得到PageData
 	 */
@@ -68,13 +63,21 @@ public abstract class BaseController {
 	}
 	
 	/**
-	 * 慎用！！ 可能引起sql注入！
-	 * @param sql
-	 * @return
+	 * ======================================================================================================
+	   *   抓娃小兵：上面的内容可以在各个项目通用，下面的内容是项目独用，仅为个人方便，不是很推荐如此偷懒，规范上SqlHelper应该在对应的serviceImpl中引用
+	 * ======================================================================================================
 	 */
-	public List<PageData> excuteSql(String sql){
-		List<PageData> result = baseMapper.excuteSql(sql);
-		return result;
+	
+	@Autowired
+	SqlMapper sqlMapper;
+	
+	/**
+	 * @return baseMapper
+	 */
+	@SuppressWarnings("unused")
+	protected SqlMapper getSqlMapper(){
+		return this.sqlMapper;
 	}
+	
 
 }

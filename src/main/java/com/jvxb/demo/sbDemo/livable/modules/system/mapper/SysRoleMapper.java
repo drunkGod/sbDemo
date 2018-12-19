@@ -10,11 +10,11 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 
 import com.jvxb.demo.sbDemo.base.entity.system.SysRole;
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 @Mapper
-public interface SysRoleMapper extends BaseMapper{
+public interface SysRoleMapper extends SqlMapper{
 
 	@SelectProvider(type = SysRoleMapperProvider.class, method = "getSysRolePageData")
 	List<SysRole> getSysRolePageData(String name);

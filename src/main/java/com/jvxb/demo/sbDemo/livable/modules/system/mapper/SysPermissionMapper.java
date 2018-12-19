@@ -9,11 +9,11 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 
 import com.jvxb.demo.sbDemo.base.entity.system.SysPermission;
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 @Mapper
-public interface SysPermissionMapper extends BaseMapper{
+public interface SysPermissionMapper extends SqlMapper{
 
 	@Select("SELECT sp.perm_id as id, sp.perm_pid as parentId, sp.perm_name as name,"
 			+ " sp.perm_id as permId, sp.perm_pid as permPid, sp.perm_name as permName,"

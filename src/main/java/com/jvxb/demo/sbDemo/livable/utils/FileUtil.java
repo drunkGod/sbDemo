@@ -11,8 +11,6 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Date;
-import java.util.Random;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class FileUtil {
 
-	private static Random random = new Random();
 	/**
 	 * @Description : 上传文件
 	 * @param file     : 上传的文件实体
@@ -64,7 +61,30 @@ public class FileUtil {
 		outputStream.flush();
 		outputStream.close();
 		response.flushBuffer();
-
+	}
+	
+	/**
+	 * 文件下载
+	 * 
+	 * @param response
+	 * @param file : 下载的文件对象
+	 * @param fileName : 下载后显示的名字
+	 * @throws Exception
+	 */
+	public static void fileDownload(final HttpServletResponse response, File file, String fileName)
+			throws Exception {
+		
+		byte[] data = FileUtil.toByteArray2(file);
+		fileName = URLEncoder.encode(fileName, "UTF-8");
+		response.reset();
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+		response.addHeader("Content-Length", "" + data.length);
+		response.setContentType("application/octet-stream;charset=UTF-8");
+		OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+		outputStream.write(data);
+		outputStream.flush();
+		outputStream.close();
+		response.flushBuffer();
 	}
 
 	/**
@@ -75,16 +95,19 @@ public class FileUtil {
 	 * @throws Exception
 	 */
 	private static byte[] toByteArray2(String filePath) throws Exception {
-
-		File f = new File(filePath);
-		if (!f.exists()) {
+		File file = new File(filePath);
+		if (!file.exists()) {
 			throw new Exception(filePath);
 		}
-
+		return toByteArray2(file);
+	}
+	
+	
+	private static byte[] toByteArray2(File file) throws Exception {
 		FileChannel channel = null;
 		FileInputStream fs = null;
 		try {
-			fs = new FileInputStream(f);
+			fs = new FileInputStream(file);
 			channel = fs.getChannel();
 			ByteBuffer byteBuffer = ByteBuffer.allocate((int) channel.size());
 			while ((channel.read(byteBuffer)) > 0) {
@@ -129,27 +152,6 @@ public class FileUtil {
 		}
 	}
 	
-	/**
-	 * 格式化文件名称, 避免文件名重复
-	 */
-	public static String formatFileName(String fileName) {
-		String prefix = fileName.getBytes().toString().substring(3);
-		String midfix = new Date().getTime() + "";
-		String random1 = random.nextInt(10) + "";
-		String random2 = random.nextInt(10) + "";
-		String suffix = fileName.replaceAll(".+(\\.\\w+)", "$1");
-		String realName = prefix + midfix + random1 + random2 + suffix;
-		return realName;
-	}
-	
-	/**
-	 * 设置上传路径：根据上传时间和上传类型设置
-	 */
-	public static String formatUploadPath(String basePath, String type, String date) {
-		String uploadPath = basePath + type + File.separator + date + File.separator;
-		return uploadPath;
-	}
-
 	/**
 	 * 生成多个目录：
 	 * 

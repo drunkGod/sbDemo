@@ -28,7 +28,8 @@ public class UserInfoServiceImpl implements IUserInfoService {
 		List<PageData> list = userInfoMapper.getTablePageData(phone, idcard);
 		PageInfo<PageData> pageInfo = new PageInfo<>(list);
 		JSONObject pageJson = LayuiPageUtil.getLayuiPage(pageInfo);
-		return pageJson;	}
+		return pageJson;
+	}
 
 	@Override
 	public void insertOrUpdate(PageData pd) {

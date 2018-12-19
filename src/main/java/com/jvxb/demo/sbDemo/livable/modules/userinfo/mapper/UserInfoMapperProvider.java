@@ -22,6 +22,7 @@ public class UserInfoMapperProvider {
 		return sql;
 	}
 	
+	//插入/修改前理论上要检查手机号码是否已经存在，此处略
 	public String insertOrUpdate(PageData pd) {
         String sql = "";
         pd.turnEmptyValueToNull();
@@ -186,12 +187,31 @@ public class UserInfoMapperProvider {
 	public String insertBatch(List<PageData> listPd) {
         String sql = "";
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("insert into live_user_info (username, password) values");
+        //插入前理论上要检查手机号码是否已经存在，此处略
+        sqlBuilder.append("insert into live_user_info (username, real_name, password, phone, idcard, create_time) values");
         for(PageData pd: listPd){
-			if(pd !=null && pd.get("var0") !=null){
-				String username = pd.getString("var0");
-				String password = "123456";
-				sqlBuilder.append("('" + username +"','"+password+"'),");
+			if(pd !=null){
+				//手机号码项必须：
+				String phone = pd.getString("var1");
+				if(CommonUtil.isNullOrEmpty(phone)) {
+					continue;
+				}
+				if(phone.length() != 11 || CommonUtil.notNum(phone)) {
+					continue;
+				}
+				String password = CommonUtil.getSqlVarchar(phone.substring(5));
+				phone = CommonUtil.getSqlVarchar(phone);
+				String realName = CommonUtil.getSqlVarchar(pd.getString("var0"));
+				String idcard = CommonUtil.getSqlVarchar(pd.getString("var2"));
+				String username = phone;
+				sqlBuilder.append("(");
+				sqlBuilder.append(username + ",");
+				sqlBuilder.append(realName + ",");
+				sqlBuilder.append(password + ",");
+				sqlBuilder.append(phone + ",");
+				sqlBuilder.append(idcard + ",");
+				sqlBuilder.append("now()");
+				sqlBuilder.append("),");
 			}
 		}
         sql = CommonUtil.trimLastDot(sqlBuilder.toString());

@@ -6,10 +6,10 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 
 @Mapper
-public interface SysRolePermMapper extends BaseMapper{
+public interface SysRolePermMapper extends SqlMapper{
 
 	@Select("SELECT group_concat(perm_id) FROM sys_role_perm where role_id = #{roleId}")
 	String getRolePermByRoleId(@Param("roleId") Integer roleId);

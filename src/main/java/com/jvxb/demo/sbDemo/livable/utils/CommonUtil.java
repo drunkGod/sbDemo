@@ -106,7 +106,7 @@ public class CommonUtil {
 	}
 
 	/**
-	 * 获取插入数据库时所需的varchar形式
+	  * 获取插入数据库时所需的varchar形式： ' '  或 'xx' 或 null
 	 * 
 	 * @param str
 	 */

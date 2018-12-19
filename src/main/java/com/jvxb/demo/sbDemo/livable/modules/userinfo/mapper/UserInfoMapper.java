@@ -8,12 +8,12 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 
 @Mapper
-public interface UserInfoMapper extends BaseMapper{
+public interface UserInfoMapper extends SqlMapper{
 
 	@SelectProvider(type=UserInfoMapperProvider.class, method="getTablePageData")
 	List<PageData> getTablePageData(@Param("phone") String phone, @Param("idcard") String idcard);

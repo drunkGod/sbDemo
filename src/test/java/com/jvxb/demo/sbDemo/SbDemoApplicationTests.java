@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SbDemoApplicationTests {
 	
 	@Autowired
-	BaseMapper baseMapper;
+	SqlMapper baseMapper;
 	
 	@Test
 	public void contextLoads() {

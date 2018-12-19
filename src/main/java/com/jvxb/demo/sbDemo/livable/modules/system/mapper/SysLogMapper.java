@@ -8,11 +8,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.SelectProvider;
 
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 @Mapper
-public interface SysLogMapper extends BaseMapper{
+public interface SysLogMapper extends SqlMapper{
 
 	@SelectProvider(type = SysLogMapperProvider.class, method = "getTablePageData")
 	List<PageData> getTablePageData(@Param("operator_name") String operator_name, @Param("content") String content,

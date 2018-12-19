@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,9 +38,9 @@ import com.jvxb.demo.sbDemo.livable.utils.response.ResponseMessage;
 public class UserInfoController extends BaseController {
 
 	@Autowired
-	IUserInfoService userInfoService;
+	private IUserInfoService userInfoService;
 	@Autowired
-	UploadUtil uploadUtil;
+	private UploadUtil uploadUtil;
 
 	/**
 	 * 前往列表页
@@ -70,14 +71,14 @@ public class UserInfoController extends BaseController {
 		model.addAttribute("id", pd.get("id"));
 		//获取图片信息
 		if(CommonUtil.notNullOrEmpty(pd.get("id"))) {
-			List<PageData> result = excuteSql("select head_url from live_user_info where id = " + pd.get("id"));
-			if(result.get(0) != null) {
-				String headUrl = result.get(0).getString("head_url");
+			PageData result = getSqlMapper().selectOne("head_url", "live_user_info", "where id = " + pd.get("id"));
+			if(result != null) {
+				String headUrl = result.getString("head_url");
 				model.addAttribute("head_url", headUrl);
 			}
-			List<PageData> result2 = excuteSql("select photo_url from live_user_info where id = " + pd.get("id"));
-			if(result2.get(0) != null) {
-				String headUrl = result2.get(0).getString("photo_url");
+			PageData result2 = getSqlMapper().selectOne("photo_url", "live_user_info", "where id = " + pd.get("id"));
+			if(result2 != null) {
+				String headUrl = result2.getString("photo_url");
 				model.addAttribute("photo_url", headUrl);
 			}
 		}
@@ -92,9 +93,15 @@ public class UserInfoController extends BaseController {
 	@LogAnnotation(operate = "注册用户新增/编辑")
 	public Object userInfoSave() {
 		PageData pd = this.getPageData();
-		pd.put("password",
-				pd.getString("phone") != null && pd.getString("phone").length() > 6 ? pd.getString("phone").substring(5)
-						: "123456");
+		String phone = pd.getString("phone");
+		if(CommonUtil.isNullOrEmpty(phone)) {
+			return ResponseMessage.error("请输入手机号码");
+		}
+		if(phone.length() != 11 || CommonUtil.notNum(phone)) {
+			return ResponseMessage.error("请输入有效手机号码");
+		}
+		//密码：默认为手机号码后六位
+		pd.put("password", phone.substring(5));
 		// 个人爱好
 		String hobby = "";
 		String[] hobbyArr = { "hobby[man]", "hobby[girl]", "hobby[drink]", "hobby[eat]" };
@@ -185,7 +192,6 @@ public class UserInfoController extends BaseController {
 				@SuppressWarnings("rawtypes")
 				List<PageData> listPd = (List)ObjectExcelRead.readExcel(excelPath, 2, 0, 0);
 				if (listPd != null && listPd.size() > 0) {
-					listPd.forEach((e)-> System.out.println(e.toString()));
 					userInfoService.insertBatch(listPd);
 				}
 				
@@ -202,12 +208,15 @@ public class UserInfoController extends BaseController {
 	@RequestMapping("/user/downUser")
 	@LogAnnotation(operate = "下载用户模板")
 	public void downUser(HttpServletResponse response) {
-		//目标模板文件的位置
-		String targetPosition = uploadUtil.getUploadPath() + "excel" + File.separator + "_template" + File.separator + "userTemplate.xls";
-		//下载后显示的名字
-		String downLownName = "user.xls";
 		try {
-			FileUtil.fileDownload(response, targetPosition, downLownName);
+			//目标模板文件的位置
+			String srcPath = "static" + File.separator +"excel" + File.separator + "_template" + File.separator + "userTemplate.xls";
+	        File excelFile = ResourceUtils.getFile("classpath:" + srcPath);
+	        //下载后显示的名字
+			String downLownName = "user.xls";
+	        if(excelFile.exists()){
+	            FileUtil.fileDownload(response, excelFile, downLownName);
+	        }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

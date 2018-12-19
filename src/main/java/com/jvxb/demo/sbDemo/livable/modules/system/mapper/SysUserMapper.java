@@ -12,11 +12,11 @@ import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.annotations.UpdateProvider;
 
 import com.jvxb.demo.sbDemo.base.entity.system.SysUser;
-import com.jvxb.demo.sbDemo.livable.modules.base.mapper.BaseMapper;
+import com.jvxb.demo.sbDemo.livable.modules.base.mapper.SqlMapper;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 @Mapper
-public interface SysUserMapper extends BaseMapper{
+public interface SysUserMapper extends SqlMapper{
 
 	@Select("select id, username, real_name as realName, password, valid, role_id roleId, role_name roleName from sys_user where username = #{username} and password = #{password}")
 	SysUser checkExist(@Param("username") String username, @Param("password") String password);

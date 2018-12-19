@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jvxb.demo.sbDemo.livable.modules.base.controller.BaseController;
@@ -14,14 +13,14 @@ import com.jvxb.demo.sbDemo.livable.utils.ZTreeUtil;
 import com.jvxb.demo.sbDemo.livable.utils.response.ResponseMessage;
 
 /**
- * 对外提供数据的接口
+ * 基本的对外提供数据的接口
  * 
  * @author 抓娃小兵
  */
 
 @RestController
 @RequestMapping("/admin/demo/api")
-public class TestApi extends BaseController {
+public class BaseApi extends BaseController {
 
 	@GetMapping("test")
 	public Object test() {
@@ -55,13 +54,6 @@ public class TestApi extends BaseController {
 		pageDataList.add(pd1111);
 		pageDataList = ZTreeUtil.makeTree(pageDataList);
 		return ResponseMessage.ok(pageDataList);
-	}
-
-	@GetMapping("executeSql")
-	public Object executeSql(@RequestParam String sql) {
-		List<PageData> pageDataList = excuteSql(sql);
-		return ResponseMessage.ok(pageDataList);
-
 	}
 
 }
