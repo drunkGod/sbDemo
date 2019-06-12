@@ -1,5 +1,7 @@
 package com.jvxb.demo.sbDemo.livable.modules.system.controller;
 
+import java.io.File;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,7 @@ public class UploadController {
 	public Object uploadImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		String imgPath = null;
 		if (file != null && !file.isEmpty()) {
-			imgPath = uploadUtil.uploadImg(file);
+			imgPath = request.getContextPath() + File.separator + uploadUtil.uploadImg(file);
 		}
 		return ResponseMessage.ok(imgPath);
 	}

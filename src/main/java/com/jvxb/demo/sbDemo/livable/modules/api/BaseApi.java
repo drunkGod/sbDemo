@@ -1,59 +1,49 @@
 package com.jvxb.demo.sbDemo.livable.modules.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jvxb.demo.sbDemo.livable.modules.api.enums.ApiRequestStatusEnum;
 import com.jvxb.demo.sbDemo.livable.modules.base.controller.BaseController;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
-import com.jvxb.demo.sbDemo.livable.utils.ZTreeUtil;
 import com.jvxb.demo.sbDemo.livable.utils.response.ResponseMessage;
 
 /**
- * 基本的对外提供数据的接口
+ * 基本的对外提供数据的接口，任意用户都可以请求
  * 
  * @author 抓娃小兵
  */
 
 @RestController
-@RequestMapping("/admin/demo/api")
+@RequestMapping("/admin/api/base")
 public class BaseApi extends BaseController {
+
+	@GetMapping({"", "err"})
+	public Object err(HttpServletRequest request) {
+		String status = request.getParameter("status");
+		String errMsg = ApiRequestStatusEnum.getDescByStatus(status);
+		return ResponseMessage.error("请求失败! 原因：" + "[" + errMsg + "]");
+	}
 
 	@GetMapping("test")
 	public Object test() {
 		ResponseMessage<Object> result = ResponseMessage.ok();
-		String msg = "call success!";
+		String msg = "请求数据成功!";
 		String requestInfo = "";
 		PageData requestDataMap = getPageData();
 		if (!requestDataMap.isEmpty()) {
 			requestInfo = requestDataMap.toString();
+			//测试
+			System.out.println(10/0);
 		}
-		result.setMessage(msg + "your requestInfo：【" + requestInfo + "】");
+		PageData userData = getSqlMapper().selectOne("count(1) as count", "live_user_info", null);
+		PageData returnData = new PageData("注册用户总数", userData.get("count"));
+		result.setData(returnData);
+		result.setMessage(msg + "your requestInfo: [" + requestInfo + "]");
 		return result;
-	}
-
-	@GetMapping("treeTest")
-	public Object treeTest() {
-		List<PageData> pageDataList = new ArrayList<>();
-		PageData pd1 = new PageData("id", 1, "name", "节点1", "parentId", null);
-		PageData pd2 = new PageData("id", 2, "name", "节点2", "parentId", null);
-		PageData pd11 = new PageData("id", 3, "name", "节点1.1", "parentId", 1);
-		PageData pd12 = new PageData("id", 4, "name", "节点1.2", "parentId", 1);
-		PageData pd111 = new PageData("id", 5, "name", "节点1.1.1", "parentId", 3);
-		PageData pd112 = new PageData("id", 6, "name", "节点1.1.2", "parentId", 3);
-		PageData pd1111 = new PageData("id", 7, "name", "节点1.1.1.1", "parentId", 5);
-		pageDataList.add(pd1);
-		pageDataList.add(pd2);
-		pageDataList.add(pd11);
-		pageDataList.add(pd12);
-		pageDataList.add(pd111);
-		pageDataList.add(pd112);
-		pageDataList.add(pd1111);
-		pageDataList = ZTreeUtil.makeTree(pageDataList);
-		return ResponseMessage.ok(pageDataList);
 	}
 
 }

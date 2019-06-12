@@ -1,16 +1,20 @@
 package com.jvxb.demo.sbDemo.livable.utils;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,18 +66,17 @@ public class FileUtil {
 		outputStream.close();
 		response.flushBuffer();
 	}
-	
+
 	/**
 	 * 文件下载
 	 * 
 	 * @param response
-	 * @param file : 下载的文件对象
+	 * @param file     : 下载的文件对象
 	 * @param fileName : 下载后显示的名字
 	 * @throws Exception
 	 */
-	public static void fileDownload(final HttpServletResponse response, File file, String fileName)
-			throws Exception {
-		
+	public static void fileDownload(final HttpServletResponse response, File file, String fileName) throws Exception {
+
 		byte[] data = FileUtil.toByteArray2(file);
 		fileName = URLEncoder.encode(fileName, "UTF-8");
 		response.reset();
@@ -101,8 +104,7 @@ public class FileUtil {
 		}
 		return toByteArray2(file);
 	}
-	
-	
+
 	private static byte[] toByteArray2(File file) throws Exception {
 		FileChannel channel = null;
 		FileInputStream fs = null;
@@ -132,7 +134,23 @@ public class FileUtil {
 		}
 	}
 
+	/**
+	 * 覆盖内容写文件
+	 * 
+	 * @param fileName
+	 * @param content
+	 */
 	public static void writeFile(String fileName, String content) {
+		writeFile(fileName, content, false);
+	}
+
+	/**
+	 * 追加内容写文件
+	 * 
+	 * @param fileName
+	 * @param content
+	 */
+	public static void writeFile(String fileName, String content, boolean append) {
 		File f = new File(fileName);
 		FileWriter fw = null;
 		BufferedWriter bw = null;
@@ -140,18 +158,89 @@ public class FileUtil {
 			if (!f.exists()) {
 				f.createNewFile();
 			}
-			fw = new FileWriter(f.getAbsoluteFile()); // 表示不追加，每次覆盖之前的内容
-//          fw=new FileWriter(f.getAbsoluteFile(),true);  //true表示可以追加新内容  
+
+			if (append) {
+				fw = new FileWriter(f.getAbsoluteFile(), true); // true表示可以追加新内容
+			} else {
+				fw = new FileWriter(f.getAbsoluteFile()); // 表示不追加，每次覆盖之前的内容
+			}
 			bw = new BufferedWriter(fw);
 			bw.write(content);
 			bw.close();
-			System.out.println("生成文件" + fileName + "成功");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("生成文件" + fileName + "失败");
 		}
 	}
+
+	/**
+	 * 将文件内容读到List
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<String> readFileAsList(String filePath) {
+		File file = new File(filePath);
+		return readFileAsList(file);
+	}
 	
+	/**
+	 * 将文件内容读到String
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public static String readFileAsString(String filePath) throws IOException {
+		File file = new File(filePath);
+		return readFileAsString(file);
+	}
+	
+	/**
+	 * 将文件内容读到String
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public static String readFileAsString(File file) throws IOException {
+		BufferedReader r = new BufferedReader(new FileReader(file));
+		StringBuffer b = new StringBuffer();
+		while (true) {
+			int ch = r.read();
+			if (ch == -1) {
+				break;
+			}
+			b.append((char) ch);
+		}
+		r.close();
+		return b.toString();
+	}
+
+	/**
+	 * 将文件内容读到List
+	 * 
+	 * @return
+	 */
+	public static List<String> readFileAsList(File file) {
+		BufferedReader buf = null;
+		List<String> contentList = null;
+		try {
+			buf = new BufferedReader(new FileReader(file));
+			contentList = new ArrayList<>();
+			String str = null;
+			while ((str = buf.readLine()) != null) {
+				contentList.add(str);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				buf.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return contentList;
+	}
+
 	/**
 	 * 生成多个目录：
 	 * 
@@ -163,7 +252,7 @@ public class FileUtil {
 		if (!dir.exists()) {
 			dir.mkdirs();
 			for (int i = 0; i < 10; i++) {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 				if (dir.exists()) {
 					break;
 				}
@@ -184,7 +273,7 @@ public class FileUtil {
 			Thread.sleep(300);
 			if (!dir.exists()) {
 				for (int i = 0; i < 10; i++) {
-					Thread.sleep(1000);
+					Thread.sleep(500);
 					if (dir.exists()) {
 						break;
 					}

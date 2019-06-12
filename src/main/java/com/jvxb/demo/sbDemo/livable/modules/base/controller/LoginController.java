@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.jvxb.demo.sbDemo.base.entity.system.SysPermission;
 import com.jvxb.demo.sbDemo.base.entity.system.SysUser;
 import com.jvxb.demo.sbDemo.livable.configuration.annotation.LogAnnotation;
+import com.jvxb.demo.sbDemo.livable.configuration.constant.TitleConstant;
 import com.jvxb.demo.sbDemo.livable.modules.system.service.ISysPermissionService;
 import com.jvxb.demo.sbDemo.livable.modules.system.service.ISysUserService;
 import com.jvxb.demo.sbDemo.livable.utils.CommonUtil;
@@ -44,6 +45,8 @@ public class LoginController {
 		if (err != null && err.equals("3")) {
 			model.put("err", "帐号密码错误");
 		}
+		//项目title名
+		model.addAttribute("title", TitleConstant.TITLE_NAME);
 		return "frame/login";
 	}
 
@@ -77,11 +80,14 @@ public class LoginController {
 	@RequestMapping("/admin/index")
 	@LogAnnotation(operate = "登录系统")
 	public Object index(ModelMap model, HttpServletRequest request) {
+		
 		// 根据当前用户，获取左侧权限列表
 		SysUser sysUser = (SysUser) request.getSession().getAttribute("user");
 		String permTree = "<ul class='layui-nav layui-nav-tree'>" + getLeftPermission(sysUser, request.getContextPath())
 				+ "</ul>";
 		model.addAttribute("permTree", permTree);
+		//项目title名
+		model.addAttribute("title", TitleConstant.TITLE_NAME);
 		return "frame/index";
 	}
 

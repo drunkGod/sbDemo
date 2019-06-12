@@ -6,8 +6,8 @@
 <meta name="viewport"
 	content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Java管理系统</title>
-<link rel="icon" href="data:;base64,=">
+<title th:text="${title}">Java管理系统</title>
+<link rel="icon" th:href="@{/static/img/favicon.ico}">
 <link rel="stylesheet" th:href="@{/static/plugin/layui/css/layui.css}">
 </head>
 <body class="layui-layout-body" style="height:100%;">
@@ -18,7 +18,7 @@
 			<div class="layui-logo">Java业务管理平台</div>
 			<ul class="layui-nav layui-layout-right">
 				<li class="layui-nav-item">
-				    <a href="javascript:;"><img src="../../../static/img/default.png" class="layui-nav-img"><span th:text="${session.user.username}"></span></a>
+				    <a href="javascript:;"><img th:src="@{/static/img/default.png}" class="layui-nav-img"><span th:text="${session.user.username}"></span></a>
 				    <dl class="layui-nav-child">
 				      <dd><a href="javascript:;" onclick="openPasswordPage();">修改密码</a></dd>
 				      <dd><a th:href="@{/admin/logout}">安全退出</a></dd>

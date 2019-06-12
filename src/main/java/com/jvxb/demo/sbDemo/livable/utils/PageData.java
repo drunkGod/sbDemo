@@ -8,6 +8,12 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * 类HashMap结构工具类
+ * 
+ * @author 抓娃小兵
+ *
+ */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class PageData extends HashMap implements Map {
 

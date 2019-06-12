@@ -6,5 +6,92 @@
 </head>
 <body>
 	<h1>敬请期待~</h1>
+	
+	<div>在线人数为：<span th:text="${application.count}">0</span></div>
+	<table>
+		<tr th:each="obj : ${@sysUserServiceImpl.getAll({id:2})}">
+			<td th:text="${obj}"></td>
+		</tr>
+	</table>
+	<button type="button" class="layui-btn" onclick="addRow()">
+		<i class="layui-icon layui-icon-add-1"></i>新增行
+	</button>
+
+	<table class="layui-hide" id="demo"></table>
+
+	<script type="text/html" id="barDemo">
+ 		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+	</script>
+
+	<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+	<script>
+		var data = null;
+		data = [ {
+			"id" : "10001",
+			"username" : "杜甫",
+			"sign" : "人生恰似一场修行"
+		}, {
+			"id" : "10001",
+			"username" : "杜甫",
+			"sign" : "人生恰似一场修行"
+		}, {
+			"id" : "10008",
+			"username" : "贤心",
+			"sign" : "人生恰似一场修行"
+		} ];
+		renderTbl(data);
+		function renderTbl(data) {
+			layui.use('table', function() {
+				var table = layui.table;
+
+				//展示已知数据
+				table.render({
+					elem : '#demo',
+					cols : [ [ //标题栏
+					{field : 'id', edit : 'text', title : 'ID', width : 80, sort : true}
+					, {field : 'username', edit : 'text', title : '用户名', width : 120}
+					, {field : 'sign', edit : 'text', title : '签名', width : 160}
+					, {fixed : 'right', edit : 'text', title : '操作', width : 150, toolbar : '#barDemo'}
+					 ] ],
+					data : data,
+					page : true
+				});
+
+				table.on('tool(demo)', function(obj) {
+					var data = obj.data; //获得当前行数据
+					var layEvent = obj.event; //获得 lay-event 对应的值
+					console.log(data);
+				});
+			});
+		}
+
+		function addRow() {
+			var temp = layui.table.cache.demo[0];
+			data[layui.table.cache.demo.length++] = {
+				"id" : "", "username" : "", "sign" : ""
+			};
+			renderTbl(data);
+		}
+
+	</script>
+	
+	<script type="text/javascript" th:inline="javascript">
+		var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+		console.log($('#t1').html())
+		/** 
+		$.ajax({
+	        url: ctxPath + "/admin/sysUser/onlineCount",
+	        type: "get",
+	        dataType: "json",
+	        data: {},
+	        success: function (res) {
+	            if (res.code == 200) {
+	            	console.log(res.data);
+	            	$('#onlineNum').html(res.data);
+	            }
+	        }
+	    })
+	    */
+	</script>
 </body>
 </html>

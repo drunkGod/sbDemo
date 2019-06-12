@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 日志切面注解
+ * 系统用户登陆/操作日志-注解
  * 
  * @author 抓娃小兵
  */
