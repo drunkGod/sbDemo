@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-md3" hidden="hidden">
+				<fieldset class="layui-elem-field">
+					<legend>分类管理</legend>
+					<div class="layui-field-box">
+						<div class="layui-row layui-col-space10">
+							<div class="layui-col-md12">
+								<ul id="tree" class="ztree"></ul>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="layui-col-md9">
+				<fieldset class="layui-elem-field">
+					<legend>分类管理</legend>
+					<div class="layui-field-box">
+						<div class="layui-col-md12 layui-col-space1">
+							<div class="table_buttion_div">
+									<!-- 内容主体  -->	
+									<iframe src="http://www.runoob.com/java/java-collections.html"
+                            			id='mainIframe' frameborder="0" scrolling="auto" style="width: 99%;">
+                            		</iframe>
+                            </div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/javascript" th:inline="javascript">
+	var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+	//计算iframe高度
+    $("iframe").css("height",($(top.window).height()*0.64)+"px");
+	</script>
+
+	<script type="text/javascript" th:inline="javascript">
+
+    var zTreeObj = null;
+    var zNodes = null;
+    // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+    var setting = {
+    	//点击节点回调函数
+        callback: {
+            onClick: zTreeOnClick
+        }
+    };
+
+    function initTree() {
+        $.ajax({
+            url: ctxPath + "/admin/qaCategoryTree",
+            type: "post",
+            dataType: "json",
+            data: {},
+            success: function (res) {
+                if (res.code == 200) {
+                	var treeDataList = res.data;
+                    zNodes = [{name: "根节点", open: true, id: null, children: treeDataList}];
+                    zTreeObj = $.fn.zTree.init($("#tree"), setting, zNodes);
+                }
+            }
+        })
+    }
+
+    function zTreeOnClick(event, treeId, treeNode) {
+        //点击节点，则重载表格。
+        layui.table.reload('qaTable', {
+			where : {
+				pageSize : 10,
+				currentPage : 1,
+				id: treeNode.id, 
+				parentId: treeNode.pid
+			}
+		});
+    }
+
+    $(document).ready(function () {
+        initTree();
+    });
+
+
+	</script>
+	</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:include="frame/header :: commonHeader">
+</head>
+
+<body>
+	<div class="layui-fluid">
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-md3" hidden="hidden">
+				<fieldset class="layui-elem-field">
+					<legend>分类管理</legend>
+					<div class="layui-field-box">
+						<div class="layui-row layui-col-space10">
+							<div class="layui-col-md12">
+								<ul id="tree" class="ztree"></ul>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="layui-col-md9">
+				<fieldset class="layui-elem-field">
+					<legend>分类管理</legend>
+					<div class="layui-field-box">
+						<div class="layui-col-md12 layui-col-space1">
+							<div class="table_buttion_div">
+								<button type="button" class="layui-btn" onclick="add()">
+									<i class="layui-icon layui-icon-add-1"></i>新增
+								</button>
+								<button th:if="${session.user.roleId eq 1}" type="button"
+									class="layui-btn layui-btn-danger" onclick="batchDel()">
+									<i class="layui-icon layui-icon-delete"></i>批量删除
+								</button>
+								<button type="button" class="layui-btn"
+									onclick="reloadTable('qaCategoryTable')">
+									<i class="layui-icon layui-icon-refresh"></i>刷新
+								</button>
+									<!-- table主体  -->	
+									<table class="layui-hide" id="qaCategoryTable" lay-filter="qaCategoryTable"></table>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+	
+	<script type="text/html" id="operationBar">
+    	<button type="button" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="view">查看</button>
+    	<button type="button" class="layui-btn layui-btn-xs" lay-event="edit">编辑</button>
+    	<button type="button" class="layui-btn layui-btn-danger layui-btn-xs"  lay-event="delete"><i class="layui-icon layui-icon-delete"></i>删除</button>
+	</script>
+	
+	
+	<script type="text/javascript" th:inline="javascript">
+	var ctxPath = [[${#httpServletRequest.getContextPath()}]];
+	layui.use('table', function(){
+	  var table = layui.table;
+	  table.render({
+	    elem: '#qaCategoryTable'
+	    ,url: ctxPath + '/admin/qaCategory/pageData'
+	    ,cols: [ [
+	       {type:"numbers",width : 70, title:"序号"}
+	      ,{field:'category_name', width: 168, title: '分类名称'}
+	      ,{field:'category_desc',  width: 250, title: '分类描述'}
+	      ,{field:'sort',  width: 150, title: '排序'}
+	      ,{fixed : 'right',title : '操作', width: 270, align : 'center',toolbar : '#operationBar'}
+	    ] ]
+		  ,page: true //是否显示分页
+		  ,limits: [10, 20, 50, 100]
+		  ,limit: 10 //每页默认显示的数量
+	  });
+	  
+	  table.on('toolbar(qaCategoryTable)', function(obj) {
+			var data = obj.data; //获得当前行数据
+			var layEvent = obj.event; //获得 lay-event 对应的值
+			if (layEvent === 'add') {
+				add();
+			} else if (layEvent === 'fresh') {
+				reloadCurrentIFrame();
+			}
+	  });
+	  
+	  //监听table行中的event,lay-event
+	  table.on('tool(qaCategoryTable)', function(obj) {
+			var data = obj.data; //获得当前行数据
+			var layEvent = obj.event; //获得 lay-event 对应的值
+			if (layEvent === 'view') {
+				view(data.id);
+			} else if (layEvent === 'edit') {
+				edit(data.id);
+			} else if (layEvent === 'delete') {
+				del(data.id);
+			}
+		});
+	  
+	});
+	</script>
+
+	<script th:inline="javascript">
+	var currentTree = null;
+	
+	function add(){
+		var title = "新增";
+		var parentId = currentTree == null? '' : currentTree.id;
+		var openurl = ctxPath + "/admin/qaCategory/form?mode=add&parentId=" + parentId;
+		commonOpen(title, openurl, "700px", "490px"); 
+	}
+	
+	function view(id) {
+		var title = "查看";
+		var parentId = currentTree == null? '' : currentTree.id;
+		var openurl = ctxPath + "/admin/qaCategory/form?mode=view&id="+id+"&parentId=" + parentId;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function edit(id) {
+		var title = "编辑";
+		var parentId = currentTree == null? '' : currentTree.id;
+		var openurl = ctxPath + "/admin/qaCategory/form?mode=edit&id="+id+"&parentId=" + parentId;
+		commonOpen(title, openurl, "700px", "490px");
+	}
+	
+	function del(id) {
+		parent.layer.confirm("删除后数据不可恢复，确定需要删除吗？", {
+			btn: ["确定", "取消"]
+        }, function (){
+        	var delUrl = ctxPath + "/admin/qaCategory/delete/"+id;
+        	commonDelete(delUrl);
+        })
+	}
+	
+	function batchDel(){
+		var checkStatus = layui.table.checkStatus('qaCategoryTable');
+		if(checkStatus.data.length==0){
+			parent.layer.msg('请先选择要删除的数据行！', {icon: 2});
+			return ;
+		}
+		var ids = "";
+		for(var i=0;i<checkStatus.data.length;i++){
+			ids += checkStatus.data[i].id+",";
+		}
+		parent.layer.confirm("删除后数据不可恢复，确定需要删除吗？", {
+			btn: ["确定", "取消"]
+        }, function (){
+        	var delUrl = ctxPath + "/admin/qaCategory/deteles?ids="+ids.slice(0,-1);
+        	commonDelete(delUrl);
+        })
+		return;
+	}
+	
+	function search(){
+		layui.table.reload('qaCategoryTable',{
+			where : {
+				pageSize : 10,
+				currentPage : 1,
+				id: treeNode.id, 
+				parentId: treeNode.pid
+			}
+		})
+	}
+	</script>
+
+	<script type="text/javascript" th:inline="javascript">
+
+    var zTreeObj = null;
+    var zNodes = null;
+    // zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+    var setting = {
+    	//点击节点回调函数
+        callback: {
+            onClick: zTreeOnClick
+        }
+    };
+
+    function initTree() {
+        $.ajax({
+            url: ctxPath + "/admin/qaCategoryTree",
+            type: "post",
+            dataType: "json",
+            data: {},
+            success: function (res) {
+                if (res.code == 200) {
+                	var treeDataList = res.data;
+                    zNodes = [{name: "根节点", open: true, id: null, children: treeDataList}];
+                    zTreeObj = $.fn.zTree.init($("#tree"), setting, zNodes);
+                }
+            }
+        })
+    }
+
+    function zTreeOnClick(event, treeId, treeNode) {
+        //点击节点，则重载表格。
+        currentTree = treeNode;
+        layui.table.reload('qaCategoryTable', {
+			where : {
+				pageSize : 10,
+				currentPage : 1,
+				id: treeNode.id, 
+				parentId: treeNode.pid
+			}
+		});
+    }
+
+    $(document).ready(function () {
+        initTree();
+    });
+
+
+	</script>
+	
+</html>
