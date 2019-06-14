@@ -28,6 +28,9 @@ public interface SysUserMapper extends SqlMapper{
 	@Select("select id, id as userId, username, real_name as realName, password, valid, role_id roleId, role_name roleName, phone from sys_user where id = #{id}")
 	PageData get(PageData pd);
 
+	@Select("select id, id as userId, username, real_name as realName, password, valid, role_id roleId, role_name roleName, phone from sys_user")
+	List<PageData> getAll(PageData pd);
+	
 	@InsertProvider(type = SysUserMapperProvider.class, method = "insertOrUpdate")
 	void insertOrUpdate(PageData pd);
 

@@ -18,6 +18,6 @@
 2.2).执行init中的sql。主要是要把系统用户建立起来。 
 2.3).运行项目，前台输入http://localhost:8080 可前往登录页。 
 2.4).帐号 admin 密码 123456 登录。 登录进去之后就自己玩啦。
-2.5).上传资源的位置默认为E盘，可以在uploadSetting.properties中设置
+2.5).上传资源的位置可以在uploadSetting.properties中设置
 
 #原博客见： https://blog.csdn.net/HelloWorld_In_Java/article/details/83794696

@@ -118,5 +118,5 @@ public class SysUserController extends BaseController {
 		PageData data = sysUserService.get(pd);
 		return ResponseMessage.ok(data);
 	}
-
+	
 }

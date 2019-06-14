@@ -1,4 +1,4 @@
-package com.jvxb.demo.sbDemo.livable.configuration.sysConf;
+package com.jvxb.demo.sbDemo.livable.configuration.conf;
 
 import java.util.Properties;
 

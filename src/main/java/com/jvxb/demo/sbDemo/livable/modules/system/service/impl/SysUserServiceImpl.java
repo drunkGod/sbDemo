@@ -52,9 +52,8 @@ public class SysUserServiceImpl implements ISysUserService {
 		return sysUserMapper.get(pd);
 	}
 
-	@Override
 	public List<PageData> getAll(PageData pd) {
-		return null;
+		return sysUserMapper.getAll(pd);
 	}
 
 	@Override

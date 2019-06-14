@@ -1,4 +1,4 @@
-package com.jvxb.demo.sbDemo.livable.configuration.annotation;
+package com.jvxb.demo.sbDemo.livable.configuration.aop;
 
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -19,11 +19,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jvxb.demo.sbDemo.base.entity.system.SysUser;
+import com.jvxb.demo.sbDemo.livable.configuration.annotation.LogAnnotation;
 import com.jvxb.demo.sbDemo.livable.modules.system.service.ISysLogService;
 import com.jvxb.demo.sbDemo.livable.utils.PageData;
 
 /**
- * 系统日志切面
+ * 系统用户登陆/操作日志-切面
  * 
  * @author 抓娃小兵
  */
@@ -33,13 +34,13 @@ public class LogAspect {
 
 	@Autowired
 	ISysLogService sysLogService;
-
+	
 	@Pointcut("@annotation(com.jvxb.demo.sbDemo.livable.configuration.annotation.LogAnnotation)")
 	public void logAspect() {
 	}
 
 	@After("logAspect()")
-	public void doBeforeMyAspect(JoinPoint joinPoint) {
+	public void afterAspect(JoinPoint joinPoint) {
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
 				.getRequest();

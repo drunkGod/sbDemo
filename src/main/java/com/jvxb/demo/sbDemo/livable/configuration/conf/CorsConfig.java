@@ -1,4 +1,4 @@
-package com.jvxb.demo.sbDemo.livable.configuration.sysConf;
+package com.jvxb.demo.sbDemo.livable.configuration.conf;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

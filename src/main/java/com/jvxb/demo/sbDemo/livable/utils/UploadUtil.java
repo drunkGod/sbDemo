@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.jvxb.demo.sbDemo.livable.configuration.sysConf.UploadPathConfig;
+import com.jvxb.demo.sbDemo.livable.configuration.conf.UploadPathProperties;
 
 /**
  * 上传工具类
@@ -20,9 +20,11 @@ import com.jvxb.demo.sbDemo.livable.configuration.sysConf.UploadPathConfig;
 public class UploadUtil {
 
 	private static Random random = new Random();
+	public static final String UPLOAD_RESOURCE = "uploadResource";
+
 
 	@Autowired
-	UploadPathConfig uploadPathConfig;
+	UploadPathProperties uploadPathConfig;
 	
 	/**
 	   *   上传图片
@@ -134,7 +136,7 @@ public class UploadUtil {
 	 * 获取前台图片标签中所需的src, uploadResource将会映射到WebMvcConfig中配置的目标文件夹，即uploadResource = uploadSetting.properties中配置的路径
 	 */
 	public String getImgSrc(String type, String nowDate, String fileName) {
-		return File.separator + "uploadResource" + File.separator + type + File.separator + nowDate + File.separator + fileName;
+		return UPLOAD_RESOURCE + File.separator + type + File.separator + nowDate + File.separator + fileName;
 	}
 
 	/**

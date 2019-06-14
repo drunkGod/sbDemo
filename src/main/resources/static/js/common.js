@@ -266,7 +266,7 @@ function isValidPhone(val){
 
 //校验身份证号
 function isValidIdCard(val){
-	if(/^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$/.test(val)){
+	if(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x))$/.test(val)){
 		return true;
 	}
 	return false;

@@ -24,11 +24,11 @@ public class CodeGenerate {
 	public static List<String> tableInfoList = new ArrayList<String>();
 	
 	/** 数据库表名称 */
-	private static final String TABLE_NAME = "sys_log";
+	private static final String TABLE_NAME = "live_qa";
 	/** 表对应的类名名称 */
-	private static final String ENTITY_NAME = "SysLog";
+	private static final String ENTITY_NAME = "Qa";
 	/** 类所在的模块名，即modules下的一级文件夹 */
-	private static final String MODULE_NAME = "system";
+	private static final String MODULE_NAME = "qa";
 	/** 生成代码所在的位置。如果需要，可以设置直接生成到项目中。 */
 	private static final String TARGET_DIR = "D:\\codeGen\\sbDemo";
 	
@@ -214,8 +214,8 @@ public class CodeGenerate {
 				"	<!-- 功能相关js -->\r\n" + 
 				"	<script type=\"text/javascript\" th:inline=\"javascript\">\r\n" + 
 				"	\r\n" + 
+				"	var ctxPath = [[${#httpServletRequest.getContextPath()}]];\r\n" + 
 				"	function initData() {\r\n" + 
-				"		var ctxPath = [[${#httpServletRequest.getContextPath()}]];\r\n" + 
 				"		//根据模式和url获取数据加载表单\r\n" + 
 				"		var mode = [[${mode}]];  \r\n" + 
 				"       var id = [[${id}]];\r\n" + 
@@ -308,7 +308,7 @@ public class CodeGenerate {
 				+ "    	<button type=\"button\" class=\"layui-btn layui-btn-danger layui-btn-xs\"  lay-event=\"delete\"><i class=\"layui-icon layui-icon-delete\"></i>删除</button>\r\n"
 				+ "	</script>\r\n" 
 				+ "	\r\n" 
-				+ "	<!-- table主体  -->" 
+				+ "	<!-- table主体  -->\r\n" 
 				+ "	<table class=\"layui-hide\" id=\"" + entityNameLower + "Table\" lay-filter=\"" + entityNameLower + "Table\"></table>\r\n" 
 				+ "	\r\n"
 				+ "	<script type=\"text/javascript\" th:inline=\"javascript\">\r\n"

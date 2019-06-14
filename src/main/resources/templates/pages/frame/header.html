@@ -38,5 +38,8 @@
 	src="../../../static/js/layDateUtil.js"></script>
 <script type="text/javascript" th:src="@{/static/js/common.js}"
 	src="../../../static/js/common.js"></script>
+<script type="text/javascript" th:inline="javascript">
+	const ctx = [[${#httpServletRequest.getContextPath()}]];
+</script>
 </head>
 </html>

@@ -1,37 +1,37 @@
 package com.jvxb.demo.sbDemo.livable.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
 /**
  * ztree工具类
- * 使用要求： 类HashMap结构中拥有 "id","name","parentId"三个属性, 使用makeTree方法可使该list成为ztree结构。
+ * 使用要求： 类Map结构中拥有 "id","name","parentId"三个属性, 使用makeTree方法可使该list成为ztree结构。
  * @author 抓娃小兵
  */
 @SuppressWarnings({"rawtypes","unchecked"})
-public class ZTreeUtil<T extends HashMap> {
+public class ZTreeUtil<T extends Map> {
 
-	public static <T extends HashMap> List<T> makeTree(List<T> HashMapList) {
+	public static <T extends Map> List<T> makeTree(List<T> MapList) {
 		List<T> parentTreeList = newArrayList();
-		// 遍历HashMap树，拿到每一个HashMap节点
-		for (T currentHashMap : HashMapList) {
+		// 遍历Map树，拿到每一个Map节点
+		for (T currentMap : MapList) {
 			// 如果当前节点为父节点,则加入父节点List.并允许其有子节点。
-			if (currentHashMap.get("parentId") == null) {
-				currentHashMap.put("children", newArrayList());
-				parentTreeList.add(currentHashMap);
+			if (currentMap.get("parentId") == null) {
+				currentMap.put("children", newArrayList());
+				parentTreeList.add(currentMap);
 			}
 		}
-		// 从HashMap树中把父节点树移除
-		HashMapList.removeAll(parentTreeList);
-		// 把剩下的HashMap树节点，继续构建子树
-		makeChildren(parentTreeList, HashMapList);
+		// 从Map树中把父节点树移除
+		MapList.removeAll(parentTreeList);
+		// 把剩下的Map树节点，继续构建子树
+		makeChildren(parentTreeList, MapList);
 		return parentTreeList;
 	}
 
-	private static <T extends HashMap> void makeChildren(List<T> parents, List<T> children) {
+	private static <T extends Map> void makeChildren(List<T> parents, List<T> children) {
 		if (children.isEmpty()) {
 			return;
 		}
@@ -56,7 +56,7 @@ public class ZTreeUtil<T extends HashMap> {
 		}
 	}
 
-	private static <T extends HashMap> ArrayList<T> newArrayList() {
+	private static <T extends Map> ArrayList<T> newArrayList() {
 		return new ArrayList<T>();
 	}
 

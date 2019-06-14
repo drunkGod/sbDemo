@@ -121,7 +121,7 @@
 		        <label class="layui-form-label">用户图片：</label>
 		        <div class="layui-word-aux">
 		            <button type="button" class="layui-btn" id="picsUpLoad2"><i class="layui-icon">&#xe67c;</i>上传图片(多选)</button>
-		            	最多可以上传5张图片，每张大小不超过1M
+		            	最多可以上传5张图片，每张大小不超过5M
 		        </div>
 		        <br>
 		        <div class="layui-input-block gallery template-image2"></div>
@@ -163,7 +163,7 @@
 	            elem: '#picsUpLoad' //绑定元素
 	            , accept: 'images'
 	            , acceptMime: 'image/*'
-	            , size: 1024
+	            , size: 5024
 	            , multiple: true
 	            , number: 1
 	            , url: ctxPath + '/admin/uploadController/uploadImg' //上传接口
@@ -173,7 +173,6 @@
 	                $(".template-image").html("");
 	            }
 	            , done: function (res, index) {
-	                var roomPicsName = res.data.name;
 	                //上传完毕回调
 	                layer.closeAll('loading'); //关闭loading
 	                if (res.code == 200) {
@@ -198,7 +197,7 @@
 	            elem: '#picsUpLoad2' //绑定元素
 	            , accept: 'images'
 	            , acceptMime: 'image/*'
-	            , size: 1024
+	            , size: 5024
 	            , multiple: true
 	            , number: 5
 	            , url: ctxPath + '/admin/uploadController/uploadImg' //上传接口
@@ -208,11 +207,9 @@
 	                $(".template-image2").html("");
 	            }
 	            , done: function (res, index) {
-	                var roomPicsName = res.data.name;
 	                //上传完毕回调
 	                layer.closeAll('loading'); //关闭loading
 	                if (res.code == 200) {
-	                	console.log(res.data);
                          if ($("#photo_url").val().length == 0) {
                              $("#photo_url").val(res.data);
                          } else {
@@ -260,6 +257,7 @@
                 if ($.trim(item) == "") {
                     return true;
                 }
+                console.log(item);
                 $(".template-image2").append('<img src="' + item + '" class="miniImg">');
             });
             layer.photos({
